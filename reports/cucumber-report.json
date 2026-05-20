@@ -1,0 +1,84 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "pesquisa-google;pesquisar-playwright-no-google",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "Pesquisar Playwright no Google",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 1561108000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "que acesso o Google",
+            "match": {
+              "location": "steps\\google.steps.ts:23"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1434725100
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "pesquiso por \"Playwright\"",
+            "match": {
+              "location": "steps\\google.steps.ts:27"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 164756999
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 7,
+            "name": "devo visualizar resultados da pesquisa",
+            "match": {
+              "location": "steps\\google.steps.ts:35"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 782304299
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 501172500
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@QA-330",
+            "line": 3
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "pesquisa-google",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Pesquisa Google",
+    "tags": [],
+    "uri": "features\\google.feature"
+  }
+]
