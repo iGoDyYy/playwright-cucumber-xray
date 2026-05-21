@@ -13,16 +13,16 @@ jobs:
       - name: Checkout projeto
         uses: actions/checkout@v4
 
-      - name: Instalar Node
+      - name: Configurar Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Instalar dependências
-        run: npm install
+        run: npm ci
 
-      - name: Instalar browsers Playwright
-        run: npx playwright install
+      - name: Instalar Playwright
+        run: node ./node_modules/playwright/cli.js install chromium
 
       - name: Executar testes
         run: npm test
