@@ -1,5 +1,18 @@
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
-import { chromium, Browser, Page, expect } from '@playwright/test';
+import {
+  Given,
+  When,
+  Then,
+  Before,
+  After
+} from '@cucumber/cucumber';
+
+import {
+  chromium,
+  Browser,
+  Page,
+  expect
+} from '@playwright/test';
+
 import { GooglePage } from '../pages/GooglePage';
 
 let browser: Browser;
@@ -7,9 +20,9 @@ let page: Page;
 let googlePage: GooglePage;
 
 Before(async () => {
-browser = await chromium.launch({
-  headless: true
-});
+  browser = await chromium.launch({
+    headless: true
+  });
 
   page = await browser.newPage();
 
@@ -18,8 +31,8 @@ browser = await chromium.launch({
 
 After(async () => {
   if (browser) {
-  await browser.close();
-}
+    await browser.close();
+  }
 });
 
 Given('que acesso o Google', async () => {
