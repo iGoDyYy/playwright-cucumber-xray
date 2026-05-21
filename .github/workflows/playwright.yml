@@ -3,7 +3,6 @@ name: Integração automática Xray
 on:
   push:
     branches:
-      - principal
       - main
 
 jobs:
@@ -11,20 +10,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout projeto
         uses: actions/checkout@v4
 
-      - name: Configurar Node
+      - name: Instalar Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: Instalar dependências
-        run: npm ci
+        run: npm install
 
       - name: Instalar Playwright
         run: npx playwright install chromium --with-deps
 
       - name: Executar testes
         run: npm test
-        
+
+      - name: Autenticar Xray
+        id: auth
+        run: |
+          response=$(curl -H "Content-Type: application/json" -X POST --data "{\"client_id\":\"${{ secrets.XRAY_CLIENT_ID }}\",\"client_secret\":\"${{ secrets.XRAY_CLIENT_SECRET }}\"}" https://xray.cloud.getxray.app/api/v2/authenticate)
+          
+          echo "token=$response" >> $GITHUB_OUTPUT
+
+      - name: Enviar resultado para Xray
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -H "Authorization: Bearer ${{ steps.auth.outputs.token }}" \
+          --data @reports/cucumber-report.json \
+          https://xray.cloud.getxray.app/api/v2/import/execution/cucumber
+          
