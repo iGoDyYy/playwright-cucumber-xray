@@ -1,0 +1,42 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Instalar browsers
+        run: npx playwright install --with-deps
+
+      - name: Executar testes
+        run: npm test
+
+      - name: Autenticar Xray
+        id: xray-auth
+        run: |
+          TOKEN=$(curl -H "Content-Type: application/json" -X POST --data "{ \"client_id\": \"${{ secrets.XRAY_CLIENT_ID }}\", \"client_secret\": \"${{ secrets.XRAY_CLIENT_SECRET }}\" }" https://xray.cloud.getxray.app/api/v2/authenticate)
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Enviar resultado para Xray
+        run: |
+          curl -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ steps.xray-auth.outputs.token }}" \
+          --data @reports/cucumber-report.json \
+          https://xray.cloud.getxray.app/api/v2/import/execution/cucumber
+          
