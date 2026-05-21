@@ -7,9 +7,9 @@ let page: Page;
 let googlePage: GooglePage;
 
 Before(async () => {
-  browser = await chromium.launch({
-    headless: false
-  });
+ browser = await chromium.launch({
+  headless: false
+});
 
   page = await browser.newPage();
 
