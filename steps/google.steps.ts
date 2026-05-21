@@ -7,8 +7,8 @@ let page: Page;
 let googlePage: GooglePage;
 
 Before(async () => {
- browser = await chromium.launch({
-  headless: false
+browser = await chromium.launch({
+  headless: true
 });
 
   page = await browser.newPage();
@@ -17,7 +17,9 @@ Before(async () => {
 });
 
 After(async () => {
+  if (browser) {
   await browser.close();
+}
 });
 
 Given('que acesso o Google', async () => {
