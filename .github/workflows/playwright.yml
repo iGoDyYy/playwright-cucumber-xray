@@ -21,8 +21,8 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
-      - name: Instalar Playwright
-        run: npx playwright install chromium --with-deps
+      - name: Instalar browsers Playwright
+        run: npx playwright install --with-deps
 
       - name: Executar testes
         run: npm test
@@ -30,8 +30,11 @@ jobs:
       - name: Autenticar Xray
         id: auth
         run: |
-          response=$(curl -H "Content-Type: application/json" -X POST --data "{\"client_id\":\"${{ secrets.XRAY_CLIENT_ID }}\",\"client_secret\":\"${{ secrets.XRAY_CLIENT_SECRET }}\"}" https://xray.cloud.getxray.app/api/v2/authenticate)
-          
+          response=$(curl -H "Content-Type: application/json" \
+          -X POST \
+          --data "{\"client_id\":\"${{ secrets.XRAY_CLIENT_ID }}\",\"client_secret\":\"${{ secrets.XRAY_CLIENT_SECRET }}\"}" \
+          https://xray.cloud.getxray.app/api/v2/authenticate)
+
           echo "token=$response" >> $GITHUB_OUTPUT
 
       - name: Enviar resultado para Xray
