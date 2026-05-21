@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "test": "cucumber-js"
-},
+    "test": "cucumber-js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

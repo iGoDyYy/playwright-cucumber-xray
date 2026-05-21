@@ -14,7 +14,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 1561108000
+              "duration": 1819632300
             }
           },
           {
@@ -23,11 +23,11 @@
             "line": 5,
             "name": "que acesso o Google",
             "match": {
-              "location": "steps\\google.steps.ts:23"
+              "location": "steps\\google.steps.ts:38"
             },
             "result": {
               "status": "passed",
-              "duration": 1434725100
+              "duration": 4861899200
             }
           },
           {
@@ -36,11 +36,11 @@
             "line": 6,
             "name": "pesquiso por \"Playwright\"",
             "match": {
-              "location": "steps\\google.steps.ts:27"
+              "location": "steps\\google.steps.ts:42"
             },
             "result": {
               "status": "passed",
-              "duration": 164756999
+              "duration": 3234849199
             }
           },
           {
@@ -49,11 +49,11 @@
             "line": 7,
             "name": "devo visualizar resultados da pesquisa",
             "match": {
-              "location": "steps\\google.steps.ts:35"
+              "location": "steps\\google.steps.ts:50"
             },
             "result": {
               "status": "passed",
-              "duration": 782304299
+              "duration": 35178499
             }
           },
           {
@@ -61,7 +61,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 501172500
+              "duration": 674178800
             }
           }
         ],
