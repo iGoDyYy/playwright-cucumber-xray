@@ -2,44 +2,100 @@ import { Page } from '@playwright/test';
 
 export class LoginPage {
 
-  constructor(private page: Page) {}
+  private page: Page;
+
+  constructor(page: Page) {
+
+    this.page = page;
+  }
 
   async clicarPainel() {
 
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
 
-    const linksPainel = this.page.locator('a[href="https://apponte.me/painel"]');
+    const linkPainel = this.page.locator(
+      'a[href="https://apponte.me/painel"]'
+    ).first();
 
-    const total = await linksPainel.count();
+    await linkPainel.waitFor({
+      state: 'visible',
+      timeout: 60000
+    });
 
-    for (let i = 0; i < total; i++) {
+    console.log('URL ANTES DO CLIQUE:', await this.page.url());
 
-      const elemento = linksPainel.nth(i);
+    // captura nova aba
+    const [novaPagina] = await Promise.all([
 
-      if (await elemento.isVisible()) {
+      this.page.context().waitForEvent('page'),
 
-        await elemento.click();
+      linkPainel.click()
+    ]);
 
-        break;
-      }
-    }
+    await novaPagina.waitForLoadState('networkidle');
+
+    this.page = novaPagina;
+
+    console.log('URL DEPOIS DO CLIQUE:', await this.page.url());
+
+    await this.page.screenshot({
+      path: 'screenshots/pagina-login.png',
+      fullPage: true
+    });
   }
 
   async preencherLogin(email: string, senha: string) {
 
-    await this.page
-      .locator('input[type="email"]')
-      .fill(email);
+    const emailInput = this.page.locator(
+      'input[type="email"]'
+    );
 
-    await this.page
-      .locator('input[type="password"]')
-      .fill(senha);
+    console.log('AGUARDANDO INPUT EMAIL');
+
+    await emailInput.waitFor({
+      state: 'visible',
+      timeout: 60000
+    });
+
+    console.log('INPUT EMAIL ENCONTRADO');
+
+    await emailInput.click();
+
+    await emailInput.fill(email);
+
+    const senhaInput = this.page.locator(
+      'input[type="password"]'
+    );
+
+    await senhaInput.waitFor({
+      state: 'visible',
+      timeout: 60000
+    });
+
+    await senhaInput.click();
+
+    await senhaInput.fill(senha);
+
+    await this.page.screenshot({
+      path: 'screenshots/login-preenchido.png',
+      fullPage: true
+    });
   }
 
   async clicarEntrar() {
 
-    await this.page
-      .getByRole('button', { name: 'Entrar' })
-      .click();
+    const botaoEntrar = this.page.getByRole(
+      'button',
+      { name: /entrar/i }
+    );
+
+    await botaoEntrar.waitFor({
+      state: 'visible',
+      timeout: 60000
+    });
+
+    await botaoEntrar.click();
+
+    await this.page.waitForLoadState('networkidle');
   }
 }
