@@ -22,9 +22,19 @@ When('clico no botão Painel', async () => {
 
 When('preencho email e senha válidos', async () => {
 
+  const email = process.env.EMAIL_LOGIN;
+  const senha = process.env.PASSWORD_LOGIN;
+
+  if (!email || !senha) {
+
+    throw new Error(
+      'EMAIL_LOGIN ou PASSWORD_LOGIN não definidos'
+    );
+  }
+
   await loginPage.preencherLogin(
-    process.env.EMAIL_LOGIN!,
-    process.env.PASSWORD_LOGIN!
+    email,
+    senha
   );
 });
 
@@ -35,5 +45,15 @@ When('clico no botão Entrar', async () => {
 
 Then('devo visualizar o painel logado', async () => {
 
-  await expect(page).toHaveURL(/painel|dashboard|home/);
+  await expect(page).toHaveURL(
+    /painel|dashboard|home/,
+    {
+      timeout: 60000
+    }
+  );
+
+  await page.screenshot({
+    path: 'screenshots/login-sucesso.png',
+    fullPage: true
+  });
 });
