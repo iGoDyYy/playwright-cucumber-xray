@@ -8,7 +8,8 @@ import {
   Then,
   Before,
   After,
-  setDefaultTimeout
+  setDefaultTimeout,
+  Status
 } from '@cucumber/cucumber';
 
 import {
@@ -32,8 +33,16 @@ let googlePage: GooglePage;
 
 Before(async function () {
 
+  if (!fs.existsSync('reports/screenshots')) {
+    fs.mkdirSync('reports/screenshots', { recursive: true });
+  }
+
+  if (!fs.existsSync('reports/videos')) {
+    fs.mkdirSync('reports/videos', { recursive: true });
+  }
+
   browser = await chromium.launch({
-    headless: false
+    headless: true
   });
 
   page = await browser.newPage({
@@ -41,6 +50,10 @@ Before(async function () {
     viewport: {
       width: 1920,
       height: 1080
+    },
+
+    recordVideo: {
+      dir: 'reports/videos'
     }
   });
 
@@ -49,28 +62,26 @@ Before(async function () {
 
 After(async function (scenario) {
 
-  if (scenario.result?.status === 'FAILED') {
-
-    if (!fs.existsSync('reports/screenshots')) {
-
-      fs.mkdirSync('reports/screenshots', {
-        recursive: true
-      });
-    }
+  if (scenario.result?.status === Status.FAILED && page) {
 
     const nomeArquivo = scenario.pickle.name
-      .replace(/\s+/g, '_');
+      .replace(/ /g, '_')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
 
     await page.screenshot({
 
       path: `reports/screenshots/ERRO_${nomeArquivo}.png`,
+
       fullPage: true
     });
 
     console.log('📸 Screenshot salva!');
   }
 
-  await browser.close();
+  await page?.close();
+
+  await browser?.close();
 });
 
 Given('que acesso o Google', async () => {
