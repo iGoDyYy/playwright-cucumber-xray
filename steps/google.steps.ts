@@ -15,7 +15,6 @@ import {
 import {
   chromium,
   Browser,
-  BrowserContext,
   Page,
   expect
 } from '@playwright/test';
@@ -27,8 +26,6 @@ import { GooglePage } from '../pages/GooglePage';
 setDefaultTimeout(60000);
 
 let browser: Browser;
-
-let context: BrowserContext;
 
 export let page: Page;
 
@@ -53,9 +50,12 @@ Before(async function () {
     ]
   });
 
-  context = await browser.newContext({
+  page = await browser.newPage({
 
-    viewport: null,
+    viewport: {
+      width: 1920,
+      height: 1080
+    },
 
     recordVideo: {
 
@@ -67,8 +67,6 @@ Before(async function () {
       }
     }
   });
-
-  page = await context.newPage();
 
   googlePage = new GooglePage(page);
 });
@@ -93,8 +91,6 @@ After(async function (scenario) {
   }
 
   await page?.close();
-
-  await context?.close();
 
   await browser?.close();
 });
