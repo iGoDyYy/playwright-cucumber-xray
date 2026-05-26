@@ -6,17 +6,27 @@ export class LoginPage {
 
   async clicarPainel() {
 
-    await this.page.locator('#menu-main')
-      .getByText('Painel')
-      .click();
+    await this.page.waitForLoadState('networkidle');
+
+    const botaoPainel = this.page
+      .locator('a[href="https://apponte.me/painel"]')
+      .first();
+
+    await botaoPainel.waitFor({
+      state: 'visible'
+    });
+
+    await botaoPainel.click();
   }
 
   async preencherLogin(email: string, senha: string) {
 
-    await this.page.locator('input[type="email"]')
+    await this.page
+      .locator('input[type="email"]')
       .fill(email);
 
-    await this.page.locator('input[type="password"]')
+    await this.page
+      .locator('input[type="password"]')
       .fill(senha);
   }
 
