@@ -28,7 +28,7 @@ export class LoginPage {
 
     await botaoPainel.click();
 
-    // espera carregamento
+    // espera carregamento da página
     await this.page.waitForLoadState('networkidle');
 
     console.log(
@@ -36,7 +36,7 @@ export class LoginPage {
       await this.page.url()
     );
 
-    // screenshot debug
+    // screenshot da página login
     await this.page.screenshot({
       path: 'screenshots/pagina-login.png',
       fullPage: true
@@ -45,11 +45,12 @@ export class LoginPage {
 
   async preencherLogin(email: string, senha: string) {
 
-    const emailInput = this.page.locator(
-      'input[type="email"]'
-    );
-
     console.log('AGUARDANDO INPUT EMAIL');
+
+    // pega o primeiro input visível da página
+    const emailInput = this.page
+      .locator('input')
+      .first();
 
     await emailInput.waitFor({
       state: 'visible',
@@ -62,9 +63,11 @@ export class LoginPage {
 
     await emailInput.fill(email);
 
-    const senhaInput = this.page.locator(
-      'input[type="password"]'
-    );
+    console.log('PREENCHENDO SENHA');
+
+    const senhaInput = this.page
+      .locator('input[type="password"]')
+      .first();
 
     await senhaInput.waitFor({
       state: 'visible',
@@ -75,7 +78,7 @@ export class LoginPage {
 
     await senhaInput.fill(senha);
 
-    // screenshot debug
+    // screenshot preenchido
     await this.page.screenshot({
       path: 'screenshots/login-preenchido.png',
       fullPage: true
@@ -83,6 +86,8 @@ export class LoginPage {
   }
 
   async clicarEntrar() {
+
+    console.log('CLICANDO EM ENTRAR');
 
     const botaoEntrar = this.page.getByRole(
       'button',
@@ -96,6 +101,18 @@ export class LoginPage {
 
     await botaoEntrar.click();
 
+    // espera login finalizar
     await this.page.waitForLoadState('networkidle');
+
+    console.log(
+      'URL FINAL:',
+      await this.page.url()
+    );
+
+    // screenshot final
+    await this.page.screenshot({
+      path: 'screenshots/login-sucesso.png',
+      fullPage: true
+    });
   }
 }
