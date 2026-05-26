@@ -22,7 +22,10 @@ When('clico no botão Painel', async () => {
 
 When('preencho email e senha válidos', async () => {
 
-  await loginPage.preencherLogin();
+  await loginPage.preencherLogin(
+    process.env.EMAIL_LOGIN!,
+    process.env.PASSWORD_LOGIN!
+  );
 });
 
 When('clico no botão Entrar', async () => {
