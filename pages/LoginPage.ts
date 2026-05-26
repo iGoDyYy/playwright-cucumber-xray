@@ -13,31 +13,30 @@ export class LoginPage {
 
     await this.page.waitForLoadState('domcontentloaded');
 
-    const linkPainel = this.page.locator(
-      'a[href="https://apponte.me/painel"]'
-    ).first();
+    // botão/menu painel
+    const botaoPainel = this.page.getByRole(
+      'link',
+      { name: /painel/i }
+    );
 
-    await linkPainel.waitFor({
+    await botaoPainel.waitFor({
       state: 'visible',
       timeout: 60000
     });
 
-    console.log('URL ANTES DO CLIQUE:', await this.page.url());
+    console.log('CLICANDO NO BOTÃO PAINEL');
 
-    // captura nova aba
-    const [novaPagina] = await Promise.all([
+    await botaoPainel.click();
 
-      this.page.context().waitForEvent('page'),
+    // espera carregamento
+    await this.page.waitForLoadState('networkidle');
 
-      linkPainel.click()
-    ]);
+    console.log(
+      'URL APÓS CLIQUE:',
+      await this.page.url()
+    );
 
-    await novaPagina.waitForLoadState('networkidle');
-
-    this.page = novaPagina;
-
-    console.log('URL DEPOIS DO CLIQUE:', await this.page.url());
-
+    // screenshot debug
     await this.page.screenshot({
       path: 'screenshots/pagina-login.png',
       fullPage: true
@@ -76,6 +75,7 @@ export class LoginPage {
 
     await senhaInput.fill(senha);
 
+    // screenshot debug
     await this.page.screenshot({
       path: 'screenshots/login-preenchido.png',
       fullPage: true
