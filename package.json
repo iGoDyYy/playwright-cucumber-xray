@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cucumber-js"
+   "test": "cucumber-js --format json:reports/cucumber-report.json"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
     "@cucumber/cucumber": "^12.9.0",
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.1",
+    "multiple-cucumber-html-reporter": "^3.10.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },

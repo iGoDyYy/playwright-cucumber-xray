@@ -1,3 +1,5 @@
+@regression
+@google
 Feature: Pesquisa Google
 
   @QA-330
