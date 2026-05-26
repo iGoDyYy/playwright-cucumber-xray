@@ -25,7 +25,7 @@ jobs:
       - name: Configurar Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Instalar dependências
         run: npm ci
@@ -41,7 +41,7 @@ jobs:
           mkdir -p reports/html-report
           mkdir -p screenshots
 
-      - name: Debug variáveis ambiente
+      - name: Validar variáveis ambiente
         run: |
           echo "EMAIL_LOGIN existe?"
           if [ -z "$EMAIL_LOGIN" ]; then
@@ -88,10 +88,3 @@ jobs:
         with:
           name: videos
           path: reports/videos
-
-      - name: Upload Trace
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: traces
-          path: test-results
