@@ -8,15 +8,21 @@ export class LoginPage {
 
     await this.page.waitForLoadState('networkidle');
 
-    const botaoPainel = this.page
-      .locator('a[href="https://apponte.me/painel"]')
-      .first();
+    const linksPainel = this.page.locator('a[href="https://apponte.me/painel"]');
 
-    await botaoPainel.waitFor({
-      state: 'visible'
-    });
+    const total = await linksPainel.count();
 
-    await botaoPainel.click();
+    for (let i = 0; i < total; i++) {
+
+      const elemento = linksPainel.nth(i);
+
+      if (await elemento.isVisible()) {
+
+        await elemento.click();
+
+        break;
+      }
+    }
   }
 
   async preencherLogin(email: string, senha: string) {
