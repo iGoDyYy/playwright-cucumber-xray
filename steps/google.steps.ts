@@ -42,7 +42,12 @@ Before(async function () {
   }
 
   browser = await chromium.launch({
-    headless: true
+
+    headless: true,
+  
+    args: [
+      '--start-maximized'
+    ]
   });
 
   page = await browser.newPage({
@@ -53,7 +58,12 @@ Before(async function () {
     },
 
     recordVideo: {
-      dir: 'reports/videos'
+      dir: 'reports/videos',
+    
+      size: {
+        width: 1920,
+        height: 1080
+      }
     }
   });
 
