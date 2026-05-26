@@ -43,7 +43,7 @@ Before(async function () {
 
   browser = await chromium.launch({
 
-    headless: true,
+    headless: process.env.CI ? true : false,
   
     args: [
       '--start-maximized'
