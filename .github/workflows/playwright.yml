@@ -11,6 +11,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    timeout-minutes: 60
+
     env:
       EMAIL_LOGIN: ${{ secrets.EMAIL_LOGIN }}
       PASSWORD_LOGIN: ${{ secrets.PASSWORD_LOGIN }}
@@ -28,30 +30,68 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Instalar Playwright
+      - name: Instalar browsers Playwright
         run: npx playwright install --with-deps
+
+      - name: Criar pastas reports
+        run: |
+          mkdir -p reports
+          mkdir -p reports/screenshots
+          mkdir -p reports/videos
+          mkdir -p reports/html-report
+          mkdir -p screenshots
+
+      - name: Debug variáveis ambiente
+        run: |
+          echo "EMAIL_LOGIN existe?"
+          if [ -z "$EMAIL_LOGIN" ]; then
+            echo "EMAIL_LOGIN NÃO CONFIGURADO"
+            exit 1
+          else
+            echo "EMAIL_LOGIN OK"
+          fi
+
+          echo "PASSWORD_LOGIN existe?"
+          if [ -z "$PASSWORD_LOGIN" ]; then
+            echo "PASSWORD_LOGIN NÃO CONFIGURADO"
+            exit 1
+          else
+            echo "PASSWORD_LOGIN OK"
+          fi
 
       - name: Executar testes
         run: npm test
 
       - name: Gerar HTML Report
+        if: always()
         run: node scripts/generate-report.js
 
       - name: Upload HTML Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: html-report
           path: reports/html-report
 
       - name: Upload Screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
-          path: reports/screenshots
+          path: |
+            reports/screenshots
+            screenshots
 
       - name: Upload Videos
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: videos
           path: reports/videos
-          
+
+      - name: Upload Trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: traces
+          path: test-results
