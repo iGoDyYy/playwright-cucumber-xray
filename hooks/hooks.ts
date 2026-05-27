@@ -1,28 +1,60 @@
 import dotenv from 'dotenv';
+
+dotenv.config();
+
+import {
+  Before,
+  After,
+  Status,
+  setDefaultTimeout
+} from '@cucumber/cucumber';
+
+import {
+  chromium,
+  Browser,
+  BrowserContext,
+  Page
+} from '@playwright/test';
+
+import fs from 'fs';
+
+setDefaultTimeout(60000);
+
+export let browser: Browser;
+
+export let context: BrowserContext;
+
+export let page: Page;
+
+Before(async function () {
+
+  // limpa vídeos antigos
+  if (fs.existsSync('reports/videos')) {
+
     fs.rmSync('reports/videos', {
       recursive: true,
       force: true
     });
   }
 
+  // limpa screenshots antigos
   if (fs.existsSync('reports/screenshots')) {
+
     fs.rmSync('reports/screenshots', {
       recursive: true,
       force: true
     });
   }
 
-  if (!fs.existsSync('reports/screenshots')) {
-    fs.mkdirSync('reports/screenshots', {
-      recursive: true
-    });
-  }
+  // recria screenshots
+  fs.mkdirSync('reports/screenshots', {
+    recursive: true
+  });
 
-  if (!fs.existsSync('reports/videos')) {
-    fs.mkdirSync('reports/videos', {
-      recursive: true
-    });
-  }
+  // recria vídeos
+  fs.mkdirSync('reports/videos', {
+    recursive: true
+  });
 
   browser = await chromium.launch({
 
@@ -33,7 +65,7 @@ import dotenv from 'dotenv';
     ]
   });
 
-  page = await browser.newPage({
+  context = await browser.newContext({
 
     viewport: {
       width: 1920,
@@ -50,11 +82,16 @@ import dotenv from 'dotenv';
       }
     }
   });
+
+  page = await context.newPage();
 });
 
 After(async function (scenario) {
 
-  if (scenario.result?.status === Status.FAILED && page) {
+  if (
+    scenario.result?.status === Status.FAILED
+    && page
+  ) {
 
     const nomeArquivo = scenario.pickle.name
       .replace(/ /g, '_')
@@ -71,7 +108,15 @@ After(async function (scenario) {
     console.log('📸 Screenshot salva!');
   }
 
-  await page?.close();
+  if (page) {
+    await page.close();
+  }
 
-  await browser?.close();
+  if (context) {
+    await context.close();
+  }
+
+  if (browser) {
+    await browser.close();
+  }
 });
