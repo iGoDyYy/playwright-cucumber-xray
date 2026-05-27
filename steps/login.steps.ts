@@ -3,57 +3,37 @@ import {
   Then
 } from '@cucumber/cucumber';
 
-import {
-  expect
-} from '@playwright/test';
-
 import { LoginPage } from '../pages/LoginPage';
 
 import { page } from '../hooks/hooks';
 
 let loginPage: LoginPage;
 
-When('clico no botão Painel', async () => {
+When('acesso o painel de login', async () => {
 
   loginPage = new LoginPage(page);
 
-  await loginPage.clicarPainel();
+  await loginPage.acessarPainel();
 });
 
-When('preencho email e senha válidos', async () => {
+When('acesso a tela de login do painel', async () => {
 
-  const email = process.env.EMAIL_LOGIN;
-  const senha = process.env.PASSWORD_LOGIN;
+  loginPage = new LoginPage(page);
 
-  if (!email || !senha) {
-
-    throw new Error(
-      'EMAIL_LOGIN ou PASSWORD_LOGIN não definidos'
-    );
-  }
-
-  await loginPage.preencherLogin(
-    email,
-    senha
-  );
+  await loginPage.acessarPainel();
 });
 
-When('clico no botão Entrar', async () => {
+When('informo credenciais válidas', async () => {
 
-  await loginPage.clicarEntrar();
+  await loginPage.informarCredenciaisValidas();
 });
 
-Then('devo visualizar o painel logado', async () => {
+When('confirmo o login', async () => {
 
-  await expect(page).toHaveURL(
-    /painel|dashboard|home/,
-    {
-      timeout: 60000
-    }
-  );
+  await loginPage.confirmarLogin();
+});
 
-  await page.screenshot({
-    path: 'reports/screenshots/login-sucesso.png',
-    fullPage: true
-  });
+Then('devo estar autenticado no painel', async () => {
+
+  await loginPage.validarPainelLogado();
 });

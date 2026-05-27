@@ -4,10 +4,6 @@ import {
   Then
 } from '@cucumber/cucumber';
 
-import {
-  expect
-} from '@playwright/test';
-
 import { GooglePage } from '../pages/GooglePage';
 
 import { page } from '../hooks/hooks';
@@ -32,17 +28,13 @@ When(
 Then(
   'devo visualizar o título Google',
   async () => {
-
-    await expect(page)
-      .toHaveTitle(/Google/);
+    await googlePage.validarTituloGoogle();
   }
 );
 
 Then(
   'devo visualizar resultados da pesquisa',
   async () => {
-
-    await expect(page)
-      .toHaveURL(/search/);
+    await googlePage.validarResultadosDaPesquisa();
   }
 );

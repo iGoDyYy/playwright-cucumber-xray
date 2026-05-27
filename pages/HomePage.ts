@@ -1,16 +1,22 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
-export class HomePage {
+import { BasePage } from './BasePage';
 
-  constructor(private page: Page) {}
+export class HomePage extends BasePage {
+
+  constructor(page: Page) {
+    super(page);
+  }
 
   async acessarSite() {
 
     await this.page.goto('https://apponte.me');
+    await this.page.waitForLoadState('networkidle');
   }
 
-  logoApponte() {
+  async validarHomeCarregada() {
 
-    return this.page.getByRole('img');
+    await expect(this.page).toHaveURL(/apponte.me/);
+    await expect(this.page.getByRole('img')).toBeVisible();
   }
 }

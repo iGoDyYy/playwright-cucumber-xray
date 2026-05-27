@@ -1,118 +1,99 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
-export class LoginPage {
+import { BasePage } from './BasePage';
 
-  private page: Page;
+export class LoginPage extends BasePage {
 
   constructor(page: Page) {
 
-    this.page = page;
+    super(page);
   }
 
-  async clicarPainel() {
+  async acessarPainel() {
 
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState(
+      'domcontentloaded'
+    );
 
-    // botão/menu painel
     const botaoPainel = this.page.getByRole(
       'link',
       { name: /painel/i }
     );
 
-    await botaoPainel.waitFor({
-      state: 'visible',
-      timeout: 60000
-    });
+    await this.clicar(botaoPainel);
 
-    console.log('CLICANDO NO BOTÃO PAINEL');
-
-    await botaoPainel.click();
-
-    // espera carregamento da página
-    await this.page.waitForLoadState('networkidle');
-
-    console.log(
-      'URL APÓS CLIQUE:',
-      await this.page.url()
+    await this.page.waitForLoadState(
+      'networkidle'
     );
 
-    // screenshot da página login
-    await this.page.screenshot({
-      path: 'screenshots/pagina-login.png',
-      fullPage: true
-    });
+    await this.screenshot(
+      'pagina-login'
+    );
   }
 
-  async preencherLogin(email: string, senha: string) {
+  async informarCredenciaisValidas() {
 
-    console.log('AGUARDANDO INPUT EMAIL');
+    const email = process.env.EMAIL_LOGIN;
+    const senha = process.env.PASSWORD_LOGIN;
 
-    // pega o primeiro input visível da página
+    if (!email || !senha) {
+
+      throw new Error(
+        'EMAIL_LOGIN ou PASSWORD_LOGIN não definidos'
+      );
+    }
+
     const emailInput = this.page
       .locator('input')
       .first();
 
-    await emailInput.waitFor({
-      state: 'visible',
-      timeout: 60000
-    });
-
-    console.log('INPUT EMAIL ENCONTRADO');
-
-    await emailInput.click();
-
-    await emailInput.fill(email);
-
-    console.log('PREENCHENDO SENHA');
+    await this.preencher(
+      emailInput,
+      email
+    );
 
     const senhaInput = this.page
       .locator('input[type="password"]')
       .first();
 
-    await senhaInput.waitFor({
-      state: 'visible',
-      timeout: 60000
-    });
+    await this.preencher(
+      senhaInput,
+      senha
+    );
 
-    await senhaInput.click();
-
-    await senhaInput.fill(senha);
-
-    // screenshot preenchido
-    await this.page.screenshot({
-      path: 'screenshots/login-preenchido.png',
-      fullPage: true
-    });
+    await this.screenshot(
+      'login-preenchido'
+    );
   }
 
-  async clicarEntrar() {
+  async confirmarLogin() {
 
-    console.log('CLICANDO EM ENTRAR');
+    const botaoEntrar = this.page
+      .getByRole(
+        'button',
+        { name: /entrar/i }
+      );
 
-    const botaoEntrar = this.page.getByRole(
-      'button',
-      { name: /entrar/i }
+    await this.clicar(
+      botaoEntrar
     );
 
-    await botaoEntrar.waitFor({
-      state: 'visible',
-      timeout: 60000
-    });
+    await this.page.waitForLoadState(
+      'networkidle'
+    );
+  }
 
-    await botaoEntrar.click();
+  async validarPainelLogado() {
 
-    // espera login finalizar
-    await this.page.waitForLoadState('networkidle');
-
-    console.log(
-      'URL FINAL:',
-      await this.page.url()
+    await expect(this.page).toHaveURL(
+      /painel|dashboard|home/,
+      {
+        timeout: 60000
+      }
     );
 
-    // screenshot final
-    await this.page.screenshot({
-      path: 'screenshots/login-sucesso.png',
-      fullPage: true
-    });
+    await this.screenshot(
+      'login-sucesso'
+    );
   }
 }

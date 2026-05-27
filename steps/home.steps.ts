@@ -3,10 +3,6 @@ import {
   Then
 } from '@cucumber/cucumber';
 
-import {
-  expect
-} from '@playwright/test';
-
 import { HomePage } from '../pages/HomePage';
 
 import { page } from '../hooks/hooks';
@@ -22,9 +18,5 @@ Given('que acesso o Apponte.me', async () => {
 
 Then('devo visualizar a home carregada', async () => {
 
-  await expect(page).toHaveURL(/apponte.me/);
-
-  await expect(
-    homePage.logoApponte()
-  ).toBeVisible();
+  await homePage.validarHomeCarregada();
 });
