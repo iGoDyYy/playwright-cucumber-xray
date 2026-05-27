@@ -1,12 +1,22 @@
 const report = require('multiple-cucumber-html-reporter');
 
-console.log('INICIANDO GERAÇÃO RELATÓRIO...');
+console.log('GERANDO RELATÓRIO...');
 
 report.generate({
 
   jsonDir: 'reports',
 
   reportPath: 'reports/html-report',
+
+  openReportInBrowser: true,
+
+  saveCollectedJSON: true,
+
+  displayDuration: true,
+
+  pageTitle: 'Automação Apponte',
+
+  reportName: 'Execução Automação QA',
 
   metadata: {
 
@@ -15,7 +25,7 @@ report.generate({
       version: 'latest'
     },
 
-    device: 'Local test machine',
+    device: 'QA Machine',
 
     platform: {
       name: 'windows',
@@ -25,7 +35,7 @@ report.generate({
 
   customData: {
 
-    title: 'Execução Automação',
+    title: 'Execução',
 
     data: [
 
@@ -37,6 +47,11 @@ report.generate({
       {
         label: 'QA',
         value: 'Matheus Faiotto'
+      },
+
+      {
+        label: 'Ambiente',
+        value: 'Produção'
       }
     ]
   }

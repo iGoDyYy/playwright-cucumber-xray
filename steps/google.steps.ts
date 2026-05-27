@@ -33,16 +33,40 @@ let googlePage: GooglePage;
 
 Before(async function () {
 
-  if (!fs.existsSync('reports/screenshots')) {
-    fs.mkdirSync('reports/screenshots', { recursive: true });
+  // limpa vídeos antigos
+  if (fs.existsSync('reports/videos')) {
+    fs.rmSync('reports/videos', {
+      recursive: true,
+      force: true
+    });
   }
 
+  // limpa screenshots antigos
+  if (fs.existsSync('reports/screenshots')) {
+    fs.rmSync('reports/screenshots', {
+      recursive: true,
+      force: true
+    });
+  }
+
+  // recria pasta screenshots
+  if (!fs.existsSync('reports/screenshots')) {
+    fs.mkdirSync('reports/screenshots', {
+      recursive: true
+    });
+  }
+
+  // recria pasta videos
   if (!fs.existsSync('reports/videos')) {
-    fs.mkdirSync('reports/videos', { recursive: true });
+    fs.mkdirSync('reports/videos', {
+      recursive: true
+    });
   }
 
   browser = await chromium.launch({
 
+    // local abre navegador
+    // github roda headless
     headless: process.env.CI ? true : false,
 
     args: [
@@ -73,6 +97,7 @@ Before(async function () {
 
 After(async function (scenario) {
 
+  // screenshot somente em falha
   if (scenario.result?.status === Status.FAILED && page) {
 
     const nomeArquivo = scenario.pickle.name
