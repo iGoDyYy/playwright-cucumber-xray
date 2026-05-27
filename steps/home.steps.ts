@@ -9,7 +9,7 @@ import {
 
 import { HomePage } from '../pages/HomePage';
 
-import { page } from './google.steps';
+import { page } from '../hooks/hooks';
 
 let homePage: HomePage;
 
