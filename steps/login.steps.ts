@@ -9,13 +9,6 @@ import { page } from '../hooks/hooks';
 
 let loginPage: LoginPage;
 
-When('acesso o painel de login', async () => {
-
-  loginPage = new LoginPage(page);
-
-  await loginPage.acessarPainel();
-});
-
 When('acesso a tela de login do painel', async () => {
 
   loginPage = new LoginPage(page);
