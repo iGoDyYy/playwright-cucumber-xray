@@ -9,7 +9,7 @@ import {
 
 import { LoginPage } from '../pages/LoginPage';
 
-import { page } from './google.steps';
+import { page } from '../hooks/hooks';
 
 let loginPage: LoginPage;
 
@@ -53,7 +53,7 @@ Then('devo visualizar o painel logado', async () => {
   );
 
   await page.screenshot({
-    path: 'screenshots/login-sucesso.png',
+    path: 'reports/screenshots/login-sucesso.png',
     fullPage: true
   });
 });
