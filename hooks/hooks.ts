@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import {
+  BeforeAll,
   Before,
   After,
   Status,
@@ -26,25 +27,26 @@ export let context: BrowserContext;
 
 export let page: Page;
 
-Before(async function () {
+function limparDiretorioSeguro(diretorio: string) {
+  if (!fs.existsSync(diretorio)) {
+    return;
+  }
+
+  fs.rmSync(diretorio, {
+    recursive: true,
+    force: true,
+    maxRetries: 5,
+    retryDelay: 200
+  });
+}
+
+function prepararPastasDeRelatorio() {
 
   // limpa vídeos antigos
-  if (fs.existsSync('reports/videos')) {
-
-    fs.rmSync('reports/videos', {
-      recursive: true,
-      force: true
-    });
-  }
+  limparDiretorioSeguro('reports/videos');
 
   // limpa screenshots antigos
-  if (fs.existsSync('reports/screenshots')) {
-
-    fs.rmSync('reports/screenshots', {
-      recursive: true,
-      force: true
-    });
-  }
+  limparDiretorioSeguro('reports/screenshots');
 
   // recria screenshots
   fs.mkdirSync('reports/screenshots', {
@@ -55,6 +57,13 @@ Before(async function () {
   fs.mkdirSync('reports/videos', {
     recursive: true
   });
+}
+
+BeforeAll(async function () {
+  prepararPastasDeRelatorio();
+});
+
+Before(async function () {
 
   browser = await chromium.launch({
 
