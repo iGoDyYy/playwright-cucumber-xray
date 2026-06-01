@@ -170,57 +170,60 @@ export class CadastroPage extends BasePage {
         }
       );
   
+    await expect(
+      this.page.locator(
+        'input[name="street"]'
+      )
+    ).not.toHaveValue('', {
+      timeout: 60000
+    });
+  
+    await expect(
+      this.page.locator(
+        'input[name="number"]'
+      )
+    ).not.toHaveValue('', {
+      timeout: 30000
+    });
+  
     await botaoProximo.click();
   
     await this.page.waitForTimeout(5000);
   
-    console.log(
-      'URL DOCUMENTOS:',
-      await this.page.url()
-    );
-  
-    const inputs =
-      this.page.locator('input');
-  
-    const total =
-      await inputs.count();
+    const urlAtual =
+      await this.page.url();
   
     console.log(
-      'TOTAL INPUTS:',
-      total
+      'URL APÓS ENDEREÇO:',
+      urlAtual
     );
   
-    for (let i = 0; i < total; i++) {
+    if (
+      urlAtual.includes('#documents')
+    ) {
   
-      console.log(
-        `INPUT ${i}:`,
-        await inputs.nth(i).evaluate(
-          (el: any) => ({
-            name: el.name,
-            id: el.id,
-            placeholder: el.placeholder,
-            type: el.type
-          })
-        )
+      await this.screenshot(
+        'pagina-documentos'
       );
+  
+      return;
     }
   
-    const labels =
-      this.page.locator('label');
+    console.log(
+      'Não avançou para documentos. Tentando novamente...'
+    );
   
-    const totalLabels =
-      await labels.count();
+    await botaoProximo.click();
   
-    for (let i = 0; i < totalLabels; i++) {
-  
-      console.log(
-        `LABEL ${i}:`,
-        await labels.nth(i).textContent()
-      );
-    }
+    await this.page.waitForURL(
+      /#documents/,
+      {
+        timeout: 60000
+      }
+    );
   
     await this.screenshot(
-      'debug-documentos'
+      'pagina-documentos'
     );
   }
 
@@ -230,7 +233,7 @@ export class CadastroPage extends BasePage {
 
     await this.page.waitForURL(
       /#documents/,
-      { timeout: 30000 }
+      { timeout: 60000 }
     );
 
     await this.page.locator(
