@@ -7,7 +7,12 @@
     "test": "cucumber-js --format json:reports/cucumber-report.json",
     "test:dry": "cucumber-js --dry-run",
     "test:smoke": "cucumber-js --tags \"@smoke\" --format json:reports/cucumber-report.json",
-    "test:regression": "cucumber-js --tags \"@regression\" --format json:reports/cucumber-report.json"
+    "test:regression": "cucumber-js --tags \"@regression\" --format json:reports/cucumber-report.json",
+    "test:cadastro": "cucumber-js --tags \"@cadastro and not @cadastro-real\" --format json:reports/cucumber-report.json",
+    "test:cadastro:real": "cucumber-js --tags \"@cadastro-real\" --format json:reports/cucumber-report.json",
+    "test:colaborador": "cucumber-js --tags \"@colaborador-cadastro\" --format json:reports/cucumber-report.json",
+    "test:colaborador:real": "cucumber-js --tags \"@colaborador-cadastro\" --format json:reports/cucumber-report.json",
+    "test:colaborador:preview": "cucumber-js --tags \"@colaborador-preview\" --format json:reports/cucumber-report.json"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +27,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.4.0",
     "axios": "^1.16.1",
     "dotenv": "^17.4.2"
   }

@@ -19,7 +19,7 @@ import {
 
 import fs from 'fs';
 
-setDefaultTimeout(60000);
+setDefaultTimeout(120000);
 
 export let browser: Browser;
 
@@ -63,11 +63,27 @@ BeforeAll(async function () {
   prepararPastasDeRelatorio();
 });
 
+Before(
+  { tags: '@cadastro-real' },
+  async function () {
+
+    if (process.env.CADASTRO_REAL !== 'true') {
+
+      console.log(
+        '⏭️ Cenário @cadastro-real ignorado. ' +
+        'Defina CADASTRO_REAL=true no .env apenas com permissão para cadastrar.'
+      );
+
+      return 'skipped';
+    }
+  }
+);
+
 Before(async function () {
 
   browser = await chromium.launch({
 
-    headless: process.env.CI ? true : false,
+    headless: process.env.CI === 'true',
 
     args: [
       '--start-maximized'

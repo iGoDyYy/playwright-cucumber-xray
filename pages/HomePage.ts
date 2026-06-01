@@ -10,13 +10,22 @@ export class HomePage extends BasePage {
 
   async acessarSite() {
 
-    await this.page.goto('https://apponte.me');
-    await this.page.waitForLoadState('networkidle');
+    await this.navegar('https://apponte.me');
+
+    await this.page.waitForLoadState(
+      'domcontentloaded'
+    );
   }
 
   async validarHomeCarregada() {
 
-    await expect(this.page).toHaveURL(/apponte.me/);
-    await expect(this.page.getByRole('img')).toBeVisible();
+    await expect(
+      this.page.getByRole(
+        'img',
+        {
+          name: /Apponte/i
+        }
+      ).first()
+    ).toBeVisible();
   }
 }

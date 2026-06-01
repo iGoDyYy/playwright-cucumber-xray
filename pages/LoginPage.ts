@@ -23,7 +23,7 @@ export class LoginPage extends BasePage {
     await this.clicar(botaoPainel);
 
     await this.page.waitForLoadState(
-      'networkidle'
+      'domcontentloaded'
     );
 
     await this.screenshot(
@@ -47,7 +47,7 @@ export class LoginPage extends BasePage {
       .locator('input')
       .first();
 
-    await this.preencher(
+    await this.preencherCampo(
       emailInput,
       email
     );
@@ -56,10 +56,12 @@ export class LoginPage extends BasePage {
       .locator('input[type="password"]')
       .first();
 
-    await this.preencher(
+    await this.preencherCampo(
       senhaInput,
       senha
     );
+
+    await this.page.waitForTimeout(500);
 
     await this.screenshot(
       'login-preenchido'
@@ -78,8 +80,9 @@ export class LoginPage extends BasePage {
       botaoEntrar
     );
 
-    await this.page.waitForLoadState(
-      'networkidle'
+    await this.page.waitForURL(
+      /employees|painel|dashboard/,
+      { timeout: 90000 }
     );
   }
 
