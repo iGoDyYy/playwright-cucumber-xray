@@ -1,0 +1,88 @@
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+export function required(name: string) {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Variável ${name} não encontrada no .env`);
+  }
+
+  return value;
+}
+
+export const jiraConfig = {
+  baseUrl: required('JIRA_BASE_URL_TEST_NOVO'),
+  email: required('JIRA_EMAIL_TEST_NOVO'),
+  apiToken: required('JIRA_API_TOKEN_TEST_NOVO'),
+  projectKey: required('PROJECT_KEY_TEST_NOVO')
+};
+
+export const issueTypes = {
+  test: '10007',
+  testSet: '10008',
+  testPlan: '10009',
+  testExecution: '10010'
+};
+
+export function getJiraHeaders() {
+  const token = Buffer
+    .from(`${jiraConfig.email}:${jiraConfig.apiToken}`)
+    .toString('base64');
+
+  return {
+    Authorization: `Basic ${token}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+}
+
+export function adf(text: string) {
+  return {
+    type: 'doc',
+    version: 1,
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text
+          }
+        ]
+      }
+    ]
+  };
+}
+
+export async function criarIssue(
+  summary: string,
+  description: string,
+  issueTypeId: string
+) {
+  const response = await axios.post(
+    `${jiraConfig.baseUrl}/rest/api/3/issue`,
+    {
+      fields: {
+        project: {
+          key: jiraConfig.projectKey
+        },
+        summary,
+        description: adf(description),
+        issuetype: {
+          id: issueTypeId
+        }
+      }
+    },
+    {
+      headers: getJiraHeaders()
+    }
+  );
+
+  return {
+    issueId: response.data.id,
+    issueKey: response.data.key
+  };
+}

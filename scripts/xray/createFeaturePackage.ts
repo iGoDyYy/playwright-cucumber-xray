@@ -1,213 +1,34 @@
-import axios from 'axios';
 import dotenv from 'dotenv';
 import { chromium } from 'playwright';
 import path from 'path';
-import fs from 'fs';
+import axios from 'axios';
+
+import {
+  criarIssue,
+  issueTypes,
+  jiraConfig
+} from './lib/jira';
+
+import {
+  adicionarTestsAoTestExecution,
+  adicionarTestsAoTestPlan,
+  adicionarTestsAoTestSet,
+  associarTestExecutionAoTestPlan,
+  cucumberTypeId,
+  projectId
+} from './lib/xray';
+
+import {
+  carregarScenariosDoFeature
+} from './lib/feature';
+
+import {
+  salvarExecutionData
+} from './lib/execution';
 
 dotenv.config();
 
-function required(name: string) {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`Variável ${name} não encontrada no .env`);
-  }
-
-  return value;
-}
-
-const jiraBaseUrl = required('JIRA_BASE_URL_TEST_NOVO');
-const jiraEmail = required('JIRA_EMAIL_TEST_NOVO');
-const jiraApiToken = required('JIRA_API_TOKEN_TEST_NOVO');
-const projectKey = required('PROJECT_KEY_TEST_NOVO');
-
-const projectId = '10001';
 const featurePath = 'features/cadastro.feature';
-
-const issueTypes = {
-  test: '10007',
-  testSet: '10008',
-  testPlan: '10009',
-  testExecution: '10010'
-};
-
-const cucumberTypeId = '6a1eeb901dc9631a8894f160';
-
-type ScenarioData = {
-  name: string;
-  scenario: string;
-  tags: string[];
-};
-
-function traduzirParaCucumberIngles(text: string) {
-  return text
-    .replace(/^Cenario:/gm, 'Scenario:')
-    .replace(/^Cenário:/gm, 'Scenario:')
-    .replace(/^Dado /gm, 'Given ')
-    .replace(/^Quando /gm, 'When ')
-    .replace(/^Então /gm, 'Then ')
-    .replace(/^Entao /gm, 'Then ')
-    .replace(/^E /gm, 'And ');
-}
-
-function carregarScenariosDoFeature(pathFeature: string) {
-  const feature = fs.readFileSync(pathFeature, 'utf-8');
-  const lines = feature.split(/\r?\n/);
-
-  const scenarios: ScenarioData[] = [];
-  let pendingTags: string[] = [];
-  let currentScenarioName = '';
-  let currentScenarioLines: string[] = [];
-  let currentScenarioTags: string[] = [];
-
-  function salvarScenarioAtual() {
-    if (!currentScenarioName) {
-      return;
-    }
-
-    if (currentScenarioTags.includes('@cadastro-real')) {
-      return;
-    }
-
-    scenarios.push({
-      name: currentScenarioName,
-      tags: currentScenarioTags,
-      scenario: traduzirParaCucumberIngles(
-        currentScenarioLines.join('\n')
-      )
-    });
-  }
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (trimmed.startsWith('@')) {
-      pendingTags.push(trimmed);
-      continue;
-    }
-
-    if (
-      trimmed.toLowerCase().startsWith('cenario:') ||
-      trimmed.toLowerCase().startsWith('cenário:')
-    ) {
-      salvarScenarioAtual();
-
-      currentScenarioName = trimmed
-        .replace(/^Cenario:/i, '')
-        .replace(/^Cenário:/i, '')
-        .trim();
-
-      currentScenarioTags = pendingTags;
-      pendingTags = [];
-      currentScenarioLines = [trimmed];
-
-      continue;
-    }
-
-    if (!currentScenarioName) {
-      continue;
-    }
-
-    if (trimmed === '') {
-      continue;
-    }
-
-    currentScenarioLines.push(trimmed);
-  }
-
-  salvarScenarioAtual();
-
-  return scenarios;
-}
-
-function getJiraHeaders() {
-  const token = Buffer
-    .from(`${jiraEmail}:${jiraApiToken}`)
-    .toString('base64');
-
-  return {
-    Authorization: `Basic ${token}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
-}
-
-function adf(text: string) {
-  return {
-    type: 'doc',
-    version: 1,
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'text',
-            text
-          }
-        ]
-      }
-    ]
-  };
-}
-
-async function criarIssue(
-  summary: string,
-  description: string,
-  issueTypeId: string
-) {
-  const response = await axios.post(
-    `${jiraBaseUrl}/rest/api/3/issue`,
-    {
-      fields: {
-        project: {
-          key: projectKey
-        },
-        summary,
-        description: adf(description),
-        issuetype: {
-          id: issueTypeId
-        }
-      }
-    },
-    {
-      headers: getJiraHeaders()
-    }
-  );
-
-  return {
-    issueId: response.data.id,
-    issueKey: response.data.key
-  };
-}
-
-async function getXrayToken() {
-  const response = await axios.post(
-    'https://xray.cloud.getxray.app/api/v2/authenticate',
-    {
-      client_id: required('XRAY_CLIENT_ID_TEST_NOVO'),
-      client_secret: required('XRAY_CLIENT_SECRET_TEST_NOVO')
-    }
-  );
-
-  return response.data;
-}
-
-async function graphql(query: string) {
-  const token = await getXrayToken();
-
-  const response = await axios.post(
-    'https://xray.cloud.getxray.app/api/v2/graphql',
-    { query },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    }
-  );
-
-  return response.data;
-}
 
 async function capturarDadosXray(
   issueId: string,
@@ -277,7 +98,7 @@ async function capturarDadosXray(
   });
 
   await page.goto(
-    `${jiraBaseUrl}/browse/${issueKey}`,
+    `${jiraConfig.baseUrl}/browse/${issueKey}`,
     {
       waitUntil: 'domcontentloaded'
     }
@@ -424,17 +245,10 @@ async function main() {
       issueTypes.testSet
     );
 
-    await graphql(`
-      mutation {
-        addTestsToTestSet(
-          issueId: "${testSet.issueId}",
-          testIssueIds: ${JSON.stringify(testIds)}
-        ) {
-          addedTests
-          warning
-        }
-      }
-    `);
+    await adicionarTestsAoTestSet(
+      testSet.issueId,
+      testIds
+    );
 
     console.log('Criando Test Plan...');
 
@@ -444,17 +258,10 @@ async function main() {
       issueTypes.testPlan
     );
 
-    await graphql(`
-      mutation {
-        addTestsToTestPlan(
-          issueId: "${testPlan.issueId}",
-          testIssueIds: ${JSON.stringify(testIds)}
-        ) {
-          addedTests
-          warning
-        }
-      }
-    `);
+    await adicionarTestsAoTestPlan(
+      testPlan.issueId,
+      testIds
+    );
 
     console.log('Criando Test Execution...');
 
@@ -464,29 +271,15 @@ async function main() {
       issueTypes.testExecution
     );
 
-    await graphql(`
-      mutation {
-        addTestsToTestExecution(
-          issueId: "${testExecution.issueId}",
-          testIssueIds: ${JSON.stringify(testIds)}
-        ) {
-          addedTests
-          warning
-        }
-      }
-    `);
+    await adicionarTestsAoTestExecution(
+      testExecution.issueId,
+      testIds
+    );
 
-    await graphql(`
-      mutation {
-        addTestExecutionsToTestPlan(
-          issueId: "${testPlan.issueId}",
-          testExecIssueIds: ["${testExecution.issueId}"]
-        ) {
-          addedTestExecutions
-          warning
-        }
-      }
-    `);
+    await associarTestExecutionAoTestPlan(
+      testPlan.issueId,
+      testExecution.issueId
+    );
 
     const executionData = {
       featurePath,
@@ -505,10 +298,7 @@ async function main() {
       }
     };
 
-    fs.writeFileSync(
-      'scripts/xray/current-execution.json',
-      JSON.stringify(executionData, null, 2)
-    );
+    salvarExecutionData(executionData);
 
     console.log('PACOTE DA FEATURE CRIADO COM SUCESSO');
     console.log(JSON.stringify(executionData, null, 2));

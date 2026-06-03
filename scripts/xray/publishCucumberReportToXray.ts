@@ -1,69 +1,24 @@
 import axios from 'axios';
-import fs from 'fs';
-import { getXrayToken } from './getToken';
 
-type ExecutionData = {
-  tests: {
-    id: string;
-    key: string;
-    name: string;
-  }[];
-  testExecution: {
-    id: string;
-    key: string;
-  };
-};
+import {
+  carregarCucumberReport,
+  getScenarioStatus,
+  normalize
+} from './lib/cucumber';
 
-type CucumberStep = {
-  result?: {
-    status?: string;
-  };
-};
+import {
+  lerExecutionData
+} from './lib/execution';
 
-type CucumberElement = {
-  name: string;
-  steps: CucumberStep[];
-};
-
-type CucumberFeature = {
-  elements: CucumberElement[];
-};
-
-function normalize(text: string) {
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-}
-
-function getScenarioStatus(element: CucumberElement) {
-  const hasFailedStep = element.steps.some(step =>
-    step.result?.status !== 'passed'
-  );
-
-  return hasFailedStep ? 'FAILED' : 'PASSED';
-}
+import {
+  getXrayToken
+} from './lib/xray';
 
 async function main() {
   try {
-    const executionData: ExecutionData = JSON.parse(
-      fs.readFileSync(
-        'scripts/xray/current-execution.json',
-        'utf-8'
-      )
-    );
+    const executionData = lerExecutionData();
 
-    const cucumberReport: CucumberFeature[] = JSON.parse(
-      fs.readFileSync(
-        'reports/cucumber-report.json',
-        'utf-8'
-      )
-    );
-
-    const cucumberScenarios = cucumberReport.flatMap(feature =>
-      feature.elements || []
-    );
+    const cucumberScenarios = carregarCucumberReport();
 
     const testsPayload = executionData.tests.map(test => {
       const scenarioResult = cucumberScenarios.find(scenario =>
