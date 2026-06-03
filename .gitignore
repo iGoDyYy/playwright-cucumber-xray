@@ -7,3 +7,8 @@ reports/
 playwright-report/
 
 test-results/
+# Xray temporário/local
+scripts/xray/xray-token.json
+scripts/xray/chrome-profile/
+issue.json
+openapi.json
