@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/xray-automation
   pull_request:
     branches:
       - main
@@ -12,19 +13,17 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-
   teste:
-
     runs-on: ubuntu-latest
-
     timeout-minutes: 60
 
     env:
       EMAIL_LOGIN: ${{ secrets.EMAIL_LOGIN }}
       PASSWORD_LOGIN: ${{ secrets.PASSWORD_LOGIN }}
+      XRAY_CLIENT_ID_TEST_NOVO: ${{ secrets.XRAY_CLIENT_ID_TEST_NOVO }}
+      XRAY_CLIENT_SECRET_TEST_NOVO: ${{ secrets.XRAY_CLIENT_SECRET_TEST_NOVO }}
 
     steps:
-
       - name: Checkout projeto
         uses: actions/checkout@v4
 
@@ -65,8 +64,28 @@ jobs:
             echo "PASSWORD_LOGIN OK"
           fi
 
-      - name: Executar testes
-        run: npm test
+          echo "XRAY_CLIENT_ID_TEST_NOVO existe?"
+          if [ -z "$XRAY_CLIENT_ID_TEST_NOVO" ]; then
+            echo "XRAY_CLIENT_ID_TEST_NOVO NÃO CONFIGURADO"
+            exit 1
+          else
+            echo "XRAY_CLIENT_ID_TEST_NOVO OK"
+          fi
+
+          echo "XRAY_CLIENT_SECRET_TEST_NOVO existe?"
+          if [ -z "$XRAY_CLIENT_SECRET_TEST_NOVO" ]; then
+            echo "XRAY_CLIENT_SECRET_TEST_NOVO NÃO CONFIGURADO"
+            exit 1
+          else
+            echo "XRAY_CLIENT_SECRET_TEST_NOVO OK"
+          fi
+
+      - name: Executar testes cadastro
+        run: npm run test:cadastro
+
+      - name: Publicar resultado no Xray
+        if: always()
+        run: npx ts-node scripts/xray/publishCucumberReportToXray.ts
 
       - name: Gerar HTML Report
         if: always()

@@ -10,7 +10,5 @@ test-results/
 # Xray temporário/local
 scripts/xray/xray-token.json
 scripts/xray/chrome-profile/
-scripts/xray/current-execution.json
 issue.json
 openapi.json
-

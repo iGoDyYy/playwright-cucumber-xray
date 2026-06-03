@@ -1,0 +1,22 @@
+{
+  "featurePath": "features/cadastro.feature",
+  "tests": [
+    {
+      "id": "10124",
+      "key": "QA-89",
+      "name": "Validar fluxo de cadastro sem submeter"
+    }
+  ],
+  "testSet": {
+    "id": "10125",
+    "key": "QA-90"
+  },
+  "testPlan": {
+    "id": "10126",
+    "key": "QA-91"
+  },
+  "testExecution": {
+    "id": "10127",
+    "key": "QA-92"
+  }
+}
