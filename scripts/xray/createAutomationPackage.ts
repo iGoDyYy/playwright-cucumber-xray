@@ -2,6 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { chromium } from 'playwright';
 import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -23,10 +24,11 @@ const projectKey = required('PROJECT_KEY_TEST_NOVO');
 const projectId = '10001';
 
 const issueTypes = {
-  test: '10007',
-  testSet: '10008',
-  testPlan: '10009'
-};
+    test: '10007',
+    testSet: '10008',
+    testPlan: '10009',
+    testExecution: '10010'
+  };
 
 const cucumberTypeId = '6a1eeb901dc9631a8894f160';
 
@@ -431,16 +433,83 @@ function getJiraHeaders() {
         testPlan.issueId,
         test.issueId
       );
+
+      console.log('Criando Test Execution...');
+
+const testExecution = await criarIssue(
+  `Execução - ${pacote.nome}`,
+  `Execução automatizada dos testes relacionados a ${pacote.nome}.`,
+  issueTypes.testExecution
+);
+
+console.log('TEST EXECUTION CRIADO:');
+console.log(testExecution);
+
+console.log('Adicionando Test ao Test Execution...');
+
+const testExecutionResult = await graphql(`
+  mutation {
+    addTestsToTestExecution(
+      issueId: "${testExecution.issueId}",
+      testIssueIds: ["${test.issueId}"]
+    ) {
+      addedTests
+      warning
+    }
+  }
+`);
+
+console.log('TEST ADICIONADO AO TEST EXECUTION:');
+console.log(JSON.stringify(testExecutionResult, null, 2));
+
+console.log('Associando Test Execution ao Test Plan...');
+
+const executionPlanResult = await graphql(`
+  mutation {
+    addTestExecutionsToTestPlan(
+      issueId: "${testPlan.issueId}",
+      testExecIssueIds: ["${testExecution.issueId}"]
+    ) {
+      addedTestExecutions
+      warning
+    }
+  }
+`);
+
+console.log('TEST EXECUTION ASSOCIADO AO TEST PLAN:');
+console.log(JSON.stringify(executionPlanResult, null, 2));
   
       console.log('TEST ADICIONADO AO TEST PLAN:');
       console.log(JSON.stringify(testPlanResult, null, 2));
   
+      const executionData = {
+        test: {
+          id: test.issueId,
+          key: test.issueKey
+        },
+        testSet: {
+          id: testSet.issueId,
+          key: testSet.issueKey
+        },
+        testPlan: {
+          id: testPlan.issueId,
+          key: testPlan.issueKey
+        },
+        testExecution: {
+          id: testExecution.issueId,
+          key: testExecution.issueKey
+        }
+      };
+      
+      fs.writeFileSync(
+        'scripts/xray/current-execution.json',
+        JSON.stringify(executionData, null, 2)
+      );
+      
       console.log('PACOTE DE AUTOMAÇÃO CRIADO COM SUCESSO');
-      console.log({
-        test: test.issueKey,
-        testSet: testSet.issueKey,
-        testPlan: testPlan.issueKey
-      });
+      console.log(executionData);
+      console.log('Arquivo salvo em scripts/xray/current-execution.json');
+
     } catch (error: any) {
       console.log('ERRO AO CRIAR PACOTE DE AUTOMAÇÃO');
       console.log(error?.response?.data || error.message);
@@ -448,3 +517,4 @@ function getJiraHeaders() {
   }
   
   main();
+  

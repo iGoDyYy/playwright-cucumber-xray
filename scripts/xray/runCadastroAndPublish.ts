@@ -1,9 +1,17 @@
 import axios from 'axios';
 import { execSync } from 'child_process';
 import { getXrayToken } from './getToken';
+import fs from 'fs';
 
-const testExecutionKey = 'QA-68';
-const testKey = 'QA-65';
+const executionData = JSON.parse(
+    fs.readFileSync(
+      'scripts/xray/current-execution.json',
+      'utf-8'
+    )
+  );
+  
+  const testExecutionKey = executionData.testExecution.key;
+  const testKey = executionData.test.key;
 
 async function sendResultToXray(status: 'PASSED' | 'FAILED') {
   const token = await getXrayToken();
