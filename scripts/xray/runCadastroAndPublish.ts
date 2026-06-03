@@ -1,30 +1,39 @@
 import axios from 'axios';
+import fs from 'fs';
 import { execSync } from 'child_process';
 import { getXrayToken } from './getToken';
-import fs from 'fs';
 
-const executionData = JSON.parse(
-    fs.readFileSync(
-      'scripts/xray/current-execution.json',
-      'utf-8'
-    )
-  );
-  
-  const testExecutionKey = executionData.testExecution.key;
-  const testKey = executionData.test.key;
+type ExecutionData = {
+  tests: {
+    id: string;
+    key: string;
+    name: string;
+  }[];
+  testExecution: {
+    id: string;
+    key: string;
+  };
+};
+
+const executionData: ExecutionData = JSON.parse(
+  fs.readFileSync(
+    'scripts/xray/current-execution.json',
+    'utf-8'
+  )
+);
+
+const testExecutionKey = executionData.testExecution.key;
 
 async function sendResultToXray(status: 'PASSED' | 'FAILED') {
   const token = await getXrayToken();
 
   const payload = {
     testExecutionKey,
-    tests: [
-      {
-        testKey,
-        status,
-        comment: `Resultado enviado automaticamente após execução do Cucumber. Status: ${status}`
-      }
-    ]
+    tests: executionData.tests.map(test => ({
+      testKey: test.key,
+      status,
+      comment: `Resultado enviado automaticamente após execução do Cucumber. Status: ${status}`
+    }))
   };
 
   const response = await axios.post(
@@ -56,6 +65,10 @@ async function main() {
   }
 
   console.log(`Enviando resultado para o Xray: ${status}`);
+  console.log(`Test Execution: ${testExecutionKey}`);
+  console.log(
+    `Tests: ${executionData.tests.map(test => test.key).join(', ')}`
+  );
 
   try {
     const result = await sendResultToXray(status);
