@@ -28,7 +28,13 @@ import {
 
 dotenv.config();
 
-const featurePath = 'features/cadastro.feature';
+const featurePath = process.argv[2];
+
+if (!featurePath) {
+  throw new Error(
+    'Informe o caminho da feature. Exemplo: features/cadastro.feature'
+  );
+}
 
 async function capturarDadosXray(
   issueId: string,
