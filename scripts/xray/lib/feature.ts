@@ -6,15 +6,72 @@ export type ScenarioData = {
   tags: string[];
 };
 
+export type PreconditionData = {
+  name: string;
+  scenario: string;
+};
+
 export function traduzirParaCucumberIngles(text: string) {
   return text
     .replace(/^Cenario:/gm, 'Scenario:')
     .replace(/^Cenário:/gm, 'Scenario:')
+    .replace(/^Contexto:/gm, 'Background:')
     .replace(/^Dado /gm, 'Given ')
     .replace(/^Quando /gm, 'When ')
     .replace(/^Então /gm, 'Then ')
     .replace(/^Entao /gm, 'Then ')
     .replace(/^E /gm, 'And ');
+}
+
+export function carregarPreconditionDoFeature(pathFeature: string) {
+  const feature = fs.readFileSync(pathFeature, 'utf-8');
+  const lines = feature.split(/\r?\n/);
+
+  let name = '';
+  const contextLines: string[] = [];
+  let insideContext = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (
+      trimmed.toLowerCase().startsWith('contexto:') ||
+      trimmed.toLowerCase().startsWith('background:')
+    ) {
+      insideContext = true;
+      name = trimmed
+        .replace(/^Contexto:/i, '')
+        .replace(/^Background:/i, '')
+        .trim();
+
+      contextLines.push(trimmed);
+      continue;
+    }
+
+    if (
+      insideContext &&
+      (
+        trimmed.toLowerCase().startsWith('cenario:') ||
+        trimmed.toLowerCase().startsWith('cenário:') ||
+        trimmed.startsWith('@')
+      )
+    ) {
+      break;
+    }
+
+    if (insideContext && trimmed !== '') {
+      contextLines.push(trimmed);
+    }
+  }
+
+  if (!name || contextLines.length === 0) {
+    return null;
+  }
+
+  return {
+    name,
+    scenario: traduzirParaCucumberIngles(contextLines.join('\n'))
+  } as PreconditionData;
 }
 
 export function carregarScenariosDoFeature(
@@ -57,6 +114,13 @@ export function carregarScenariosDoFeature(
 
     if (trimmed.startsWith('@')) {
       pendingTags.push(trimmed);
+      continue;
+    }
+
+    if (
+      trimmed.toLowerCase().startsWith('contexto:') ||
+      trimmed.toLowerCase().startsWith('background:')
+    ) {
       continue;
     }
 

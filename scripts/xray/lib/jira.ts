@@ -24,7 +24,8 @@ export const issueTypes = {
   test: '10007',
   testSet: '10008',
   testPlan: '10009',
-  testExecution: '10010'
+  testExecution: '10010',
+  precondition: '10011'
 };
 
 export function getJiraHeaders() {
@@ -66,23 +67,33 @@ export async function criarIssue(
     `${jiraConfig.baseUrl}/rest/api/3/issue`,
     {
       fields: {
-        project: {
-          key: jiraConfig.projectKey
-        },
+        project: { key: jiraConfig.projectKey },
         summary,
         description: adf(description),
-        issuetype: {
-          id: issueTypeId
-        }
+        issuetype: { id: issueTypeId }
       }
     },
-    {
-      headers: getJiraHeaders()
-    }
+    { headers: getJiraHeaders() }
   );
 
   return {
     issueId: response.data.id,
     issueKey: response.data.key
   };
+}
+
+export async function criarIssueLink(
+  outwardIssueKey: string,
+  inwardIssueKey: string,
+  typeName = 'Relates'
+) {
+  await axios.post(
+    `${jiraConfig.baseUrl}/rest/api/3/issueLink`,
+    {
+      type: { name: typeName },
+      outwardIssue: { key: outwardIssueKey },
+      inwardIssue: { key: inwardIssueKey }
+    },
+    { headers: getJiraHeaders() }
+  );
 }

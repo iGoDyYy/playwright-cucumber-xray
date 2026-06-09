@@ -9,10 +9,12 @@ Funcionalidade: Cadastro de usuário
   Quero realizar um cadastro
   Para acessar o sistema Apponte.me
 
+Contexto: Acessar página de cadastro
+  Dado que acesso a página de cadastro
+
 @cadastro-real
 Cenario: Realizar cadastro completo com validacao de email
 
-  Dado que acesso a página de cadastro
   Quando preencho os dados do novo usuário
   E confirmo o cadastro
   E preencho os dados de endereço
@@ -26,7 +28,6 @@ Cenario: Realizar cadastro completo com validacao de email
 
 Cenario: Validar fluxo de cadastro sem submeter
 
-  Dado que acesso a página de cadastro
   Quando preencho os dados do novo usuário
   E confirmo o cadastro
   E preencho os dados de endereço

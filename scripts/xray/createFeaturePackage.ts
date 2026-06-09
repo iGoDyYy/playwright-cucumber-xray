@@ -5,11 +5,13 @@ import axios from 'axios';
 
 import {
   criarIssue,
+  criarIssueLink,
   issueTypes,
   jiraConfig
 } from './lib/jira';
 
 import {
+  adicionarPreconditionsAoTest,
   adicionarTestsAoTestExecution,
   adicionarTestsAoTestPlan,
   adicionarTestsAoTestSet,
@@ -19,6 +21,7 @@ import {
 } from './lib/xray';
 
 import {
+  carregarPreconditionDoFeature,
   carregarScenariosDoFeature
 } from './lib/feature';
 
@@ -29,10 +32,17 @@ import {
 dotenv.config();
 
 const featurePath = process.argv[2];
+const developmentIssueKey = process.argv[3];
 
 if (!featurePath) {
   throw new Error(
     'Informe o caminho da feature. Exemplo: features/cadastro.feature'
+  );
+}
+
+if (!developmentIssueKey) {
+  throw new Error(
+    'Informe a AP vinculada. Exemplo: AP-123'
   );
 }
 
@@ -159,16 +169,16 @@ async function converterParaCucumber(
   return response.data;
 }
 
-async function atualizarScenario(
+async function atualizarCucumberContent(
   issueId: string,
   testVersionId: string,
   xAcpt: string,
-  scenario: string
+  cucumberContent: string
 ) {
   const response = await axios.put(
     `https://us.xray.cloud.getxray.app/api/internal/${projectId}/test/${issueId}/cucumber?testVersionId=${testVersionId}`,
     {
-      value: scenario
+      value: cucumberContent
     },
     {
       headers: {
@@ -183,6 +193,34 @@ async function atualizarScenario(
   return response.data;
 }
 
+async function criarPreconditionAutomatica() {
+  const precondition = carregarPreconditionDoFeature(featurePath);
+
+  if (!precondition) {
+    console.log('Nenhum Contexto encontrado. Nenhuma Precondition será criada.');
+    return null;
+  }
+
+  console.log(`Criando Precondition automática: ${precondition.name}`);
+
+  const issue = await criarIssue(
+    `[PRECONDITION] ${precondition.name}`,
+    `Precondition gerada automaticamente a partir do Contexto da feature: ${featurePath}
+
+${precondition.scenario}`,
+    issueTypes.precondition
+  );
+
+  console.log('PRECONDITION CRIADA:');
+  console.log(issue);
+
+  return {
+    id: issue.issueId,
+    key: issue.issueKey,
+    name: precondition.name
+  };
+}
+
 async function main() {
   try {
     const scenarios = carregarScenariosDoFeature(featurePath);
@@ -195,6 +233,8 @@ async function main() {
     if (scenarios.length === 0) {
       throw new Error('Nenhum cenário encontrado para criação.');
     }
+
+    const precondition = await criarPreconditionAutomatica();
 
     const tests: {
       id: string;
@@ -225,7 +265,7 @@ async function main() {
         xrayData.xAcpt
       );
 
-      await atualizarScenario(
+      await atualizarCucumberContent(
         test.issueId,
         xrayData.testVersionId,
         xrayData.xAcpt,
@@ -242,6 +282,19 @@ async function main() {
     }
 
     const testIds = tests.map(test => test.id);
+
+    if (precondition) {
+      console.log('Ligando Precondition automática aos Tests...');
+
+      for (const test of tests) {
+        await adicionarPreconditionsAoTest(
+          test.id,
+          [precondition.id]
+        );
+      }
+
+      console.log('PRECONDITION LIGADA AOS TESTS COM SUCESSO');
+    }
 
     console.log('Criando Test Set...');
 
@@ -287,8 +340,38 @@ async function main() {
       testExecution.issueId
     );
 
+    console.log('Criando vínculos Jira para rastreabilidade...');
+
+    for (const test of tests) {
+      await criarIssueLink(testSet.issueKey, test.key);
+      await criarIssueLink(testPlan.issueKey, test.key);
+      await criarIssueLink(testExecution.issueKey, test.key);
+
+      if (precondition) {
+        await criarIssueLink(precondition.key, test.key);
+      }
+    }
+
+    await criarIssueLink(testPlan.issueKey, testExecution.issueKey);
+
+    console.log(`Vinculando AP ${developmentIssueKey} aos artefatos Xray...`);
+
+    await criarIssueLink(developmentIssueKey, testSet.issueKey);
+    await criarIssueLink(developmentIssueKey, testPlan.issueKey);
+    await criarIssueLink(developmentIssueKey, testExecution.issueKey);
+
+    if (precondition) {
+      await criarIssueLink(developmentIssueKey, precondition.key);
+    }
+
+    console.log('AP VINCULADA AO TEST SET, TEST PLAN, TEST EXECUTION E PRECONDITION');
+
+    console.log('VÍNCULOS JIRA CRIADOS COM SUCESSO');
+
     const executionData = {
       featurePath,
+      developmentIssueKey,
+      precondition,
       tests,
       testSet: {
         id: testSet.issueId,
