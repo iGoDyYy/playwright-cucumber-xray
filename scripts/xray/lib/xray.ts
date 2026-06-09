@@ -1,8 +1,20 @@
 import axios from 'axios';
-import { required } from './jira';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const projectId = '10001';
 export const cucumberTypeId = '6a1eeb901dc9631a8894f160';
+
+function required(name: string) {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Variável ${name} não encontrada no ambiente`);
+  }
+
+  return value;
+}
 
 export async function getXrayToken() {
   const response = await axios.post(
