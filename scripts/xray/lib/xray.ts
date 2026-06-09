@@ -112,3 +112,20 @@ export async function associarTestExecutionAoTestPlan(
     }
   `);
 }
+
+export async function adicionarPreconditionsAoTest(
+  testIssueId: string,
+  preconditionIssueIds: string[]
+) {
+  return graphql(`
+    mutation {
+      addPreconditionsToTest(
+        issueId: "${testIssueId}",
+        preconditionIssueIds: ${JSON.stringify(preconditionIssueIds)}
+      ) {
+        addedPreconditions
+        warning
+      }
+    }
+  `);
+}
