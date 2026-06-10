@@ -87,13 +87,104 @@ export async function criarIssueLink(
   inwardIssueKey: string,
   typeName = 'Relates'
 ) {
+  const exists = await issueLinkExiste(
+    outwardIssueKey,
+    inwardIssueKey
+  );
+
+  if (exists) {
+    console.log(
+      `Vínculo Jira já existe: ${outwardIssueKey} -> ${inwardIssueKey}`
+    );
+    return;
+  }
+
   await axios.post(
     `${jiraConfig.baseUrl}/rest/api/3/issueLink`,
     {
-      type: { name: typeName },
-      outwardIssue: { key: outwardIssueKey },
-      inwardIssue: { key: inwardIssueKey }
+      type: {
+        name: typeName
+      },
+      outwardIssue: {
+        key: outwardIssueKey
+      },
+      inwardIssue: {
+        key: inwardIssueKey
+      }
     },
-    { headers: getJiraHeaders() }
+    {
+      headers: getJiraHeaders()
+    }
   );
+
+  console.log(
+    `Vínculo Jira criado: ${outwardIssueKey} -> ${inwardIssueKey}`
+  );
+}
+
+export async function buscarIssuePorSummary(
+  summary: string,
+  issueTypeId?: string
+) {
+  const issueTypeFilter = issueTypeId
+    ? ` AND issuetype = ${issueTypeId}`
+    : '';
+
+  const jql =
+    `project = ${jiraConfig.projectKey}` +
+    issueTypeFilter +
+    ` ORDER BY created DESC`;
+
+  const response = await axios.post(
+    `${jiraConfig.baseUrl}/rest/api/3/search/jql`,
+    {
+      jql,
+      maxResults: 100,
+      fields: [
+        'summary',
+        'issuetype'
+      ]
+    },
+    {
+      headers: getJiraHeaders()
+    }
+  );
+
+  const issue = response.data.issues?.find(
+    (item: any) => item.fields.summary === summary
+  );
+
+  if (!issue) {
+    return null;
+  }
+
+  return {
+    issueId: issue.id,
+    issueKey: issue.key,
+    summary: issue.fields.summary
+  };
+}
+
+export async function issueLinkExiste(
+  outwardIssueKey: string,
+  inwardIssueKey: string
+) {
+  const response = await axios.get(
+    `${jiraConfig.baseUrl}/rest/api/3/issue/${outwardIssueKey}?fields=issuelinks`,
+    {
+      headers: getJiraHeaders()
+    }
+  );
+
+  const links = response.data.fields?.issuelinks || [];
+
+  return links.some((link: any) => {
+    const outwardKey = link.outwardIssue?.key;
+    const inwardKey = link.inwardIssue?.key;
+
+    return (
+      outwardKey === inwardIssueKey ||
+      inwardKey === inwardIssueKey
+    );
+  });
 }
