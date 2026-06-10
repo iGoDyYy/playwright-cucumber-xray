@@ -4,6 +4,7 @@ import path from 'path';
 import axios from 'axios';
 
 import {
+  buscarIssuePorSummary,
   criarIssue,
   criarIssueLink,
   issueTypes,
@@ -201,18 +202,39 @@ async function criarPreconditionAutomatica() {
     return null;
   }
 
-  console.log(`Criando Precondition automática: ${precondition.name}`);
+  const preconditionSummary =
+    `[PRECONDITION] ${precondition.name}`;
 
-  const issue = await criarIssue(
-    `[PRECONDITION] ${precondition.name}`,
-    `Precondition gerada automaticamente a partir do Contexto da feature: ${featurePath}
+  console.log(`Processando Precondition: ${precondition.name}`);
 
-${precondition.scenario}`,
+  let issue = await buscarIssuePorSummary(
+    preconditionSummary,
     issueTypes.precondition
   );
 
-  console.log('PRECONDITION CRIADA:');
-  console.log(issue);
+  if (issue) {
+    console.log('PRECONDITION EXISTENTE ENCONTRADA:');
+    console.log(issue);
+  } else {
+    console.log('Precondition não encontrada. Criando nova Precondition...');
+
+    const novaPrecondition = await criarIssue(
+      preconditionSummary,
+      `Precondition gerada automaticamente a partir do Contexto da feature: ${featurePath}
+
+${precondition.scenario}`,
+      issueTypes.precondition
+    );
+
+    issue = {
+      issueId: novaPrecondition.issueId,
+      issueKey: novaPrecondition.issueKey,
+      summary: preconditionSummary
+    };
+
+    console.log('PRECONDITION CRIADA:');
+    console.log(issue);
+  }
 
   return {
     id: issue.issueId,
@@ -243,16 +265,39 @@ async function main() {
     }[] = [];
 
     for (const scenario of scenarios) {
-      console.log(`Criando Test para: ${scenario.name}`);
-
-      const test = await criarIssue(
-        `[AUTOMAÇÃO] ${scenario.name}`,
-        `Validar o cenário automatizado: ${scenario.name}`,
+      const testSummary =
+        `[AUTOMAÇÃO] ${scenario.name}`;
+    
+      console.log(`Processando Test para: ${scenario.name}`);
+    
+      let test = await buscarIssuePorSummary(
+        testSummary,
         issueTypes.test
       );
-
-      console.log('TEST CRIADO:');
-      console.log(test);
+    
+      if (test) {
+        console.log('TEST EXISTENTE ENCONTRADO:');
+        console.log(test);
+      } else {
+        console.log(
+          'Test não encontrado. Criando novo Test...'
+        );
+      
+        const novoTest = await criarIssue(
+          testSummary,
+          `Validar o cenário automatizado: ${scenario.name}`,
+          issueTypes.test
+        );
+      
+        test = {
+          issueId: novoTest.issueId,
+          issueKey: novoTest.issueKey,
+          summary: testSummary
+        };
+      
+        console.log('TEST CRIADO:');
+        console.log(test);
+      }
 
       const xrayData = await capturarDadosXray(
         test.issueId,
@@ -296,12 +341,65 @@ async function main() {
       console.log('PRECONDITION LIGADA AOS TESTS COM SUCESSO');
     }
 
-    console.log('Criando Test Set...');
+    async function buscarOuCriarTestSet(
+      summary: string,
+      description: string
+    ) {
+      let testSet = await buscarIssuePorSummary(
+        summary,
+        issueTypes.testSet
+      );
+    
+      if (testSet) {
+        console.log('TEST SET EXISTENTE ENCONTRADO:');
+        console.log(testSet);
+    
+        return {
+          issueId: testSet.issueId,
+          issueKey: testSet.issueKey
+        };
+      }
+    
+      console.log('Test Set não encontrado. Criando...');
+    
+      return criarIssue(
+        summary,
+        description,
+        issueTypes.testSet
+      );
+    }
 
-    const testSet = await criarIssue(
+    async function buscarOuCriarTestPlan(
+      summary: string,
+      description: string
+    ) {
+      let testPlan = await buscarIssuePorSummary(
+        summary,
+        issueTypes.testPlan
+      );
+    
+      if (testPlan) {
+        console.log('TEST PLAN EXISTENTE ENCONTRADO:');
+        console.log(testPlan);
+    
+        return {
+          issueId: testPlan.issueId,
+          issueKey: testPlan.issueKey
+        };
+      }
+    
+      console.log('Test Plan não encontrado. Criando...');
+    
+      return criarIssue(
+        summary,
+        description,
+        issueTypes.testPlan
+      );
+    }
+
+    const testSet = await buscarOuCriarTestSet(
       'Validação do fluxo de cadastro Apponte.me',
-      'Agrupamento dos testes automatizados do fluxo de cadastro Apponte.me.',
-      issueTypes.testSet
+      'Agrupamento dos testes automatizados do fluxo de cadastro Apponte.me.'
     );
 
     await adicionarTestsAoTestSet(
@@ -309,12 +407,9 @@ async function main() {
       testIds
     );
 
-    console.log('Criando Test Plan...');
-
-    const testPlan = await criarIssue(
+    const testPlan = await buscarOuCriarTestPlan(
       'Validação do fluxo de cadastro Apponte.me',
-      'Plano de testes automatizados do fluxo de cadastro Apponte.me.',
-      issueTypes.testPlan
+      'Plano de testes automatizados do fluxo de cadastro Apponte.me.'
     );
 
     await adicionarTestsAoTestPlan(
