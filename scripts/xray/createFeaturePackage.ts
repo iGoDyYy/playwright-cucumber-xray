@@ -34,6 +34,7 @@ dotenv.config();
 
 const featurePath = process.argv[2];
 const developmentIssueKey = process.argv[3];
+const scenarioTagFilter = process.argv[4];
 
 if (!featurePath) {
   throw new Error(
@@ -245,7 +246,15 @@ ${precondition.scenario}`,
 
 async function main() {
   try {
-    const scenarios = carregarScenariosDoFeature(featurePath);
+    let scenarios = carregarScenariosDoFeature(featurePath);
+
+    if (scenarioTagFilter) {
+      scenarios = scenarios.filter(scenario =>
+        scenario.tags.includes(scenarioTagFilter)
+      );
+    
+      console.log(`Filtro de tag aplicado: ${scenarioTagFilter}`);
+    }
 
     console.log('Cenários que serão criados:');
     console.log(

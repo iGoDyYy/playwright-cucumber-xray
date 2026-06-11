@@ -377,4 +377,195 @@ export class ColaboradorPage extends BasePage {
       'colaborador-pronto-salvar'
     );
   }
+
+  async acessarAbaColaboradores() {
+    await this.page.waitForLoadState('domcontentloaded');
+  
+    let companyId: string;
+  
+    try {
+      companyId = this.extrairCompanyId();
+    } catch {
+      const urlAtual = this.page.url();
+  
+      const match = urlAtual.match(/companies\/(\d+)/);
+  
+      if (!match) {
+        throw new Error(
+          `Não foi possível identificar o ID da empresa pela URL atual: ${urlAtual}`
+        );
+      }
+  
+      companyId = match[1];
+    }
+  
+    await this.navegar(
+      `https://www.apponte.me/painel/companies/${companyId}/employees`
+    );
+  
+    await this.page.waitForURL(
+      /\/employees\/?$/,
+      { timeout: 60000 }
+    );
+  
+    await this.page.waitForLoadState('domcontentloaded');
+  
+    await this.screenshot('aba-colaboradores-evento');
+  }
+  
+  async acessarPerfilPrimeiroColaborador() {
+    await this.page.waitForLoadState('domcontentloaded');
+  
+    await this.page.waitForTimeout(1000);
+  
+    const linkColaborador = this.page
+      .locator('a[href*="/employees/"]')
+      .filter({
+        hasNot: this.page.locator('a[href*="/employees/create"]')
+      })
+      .first();
+  
+    await expect(linkColaborador).toHaveAttribute(
+      'href',
+      /\/employees\/\d+/,
+      { timeout: 60000 }
+    );
+  
+    const href = await linkColaborador.getAttribute('href');
+  
+    if (!href) {
+      throw new Error('Não foi possível capturar o link do perfil do colaborador.');
+    }
+  
+    const urlPerfil = href.startsWith('http')
+      ? href
+      : `https://www.apponte.me${href}`;
+  
+    await this.navegar(urlPerfil);
+  
+    await this.page.waitForURL(
+      /\/employees\/\d+/,
+      { timeout: 60000 }
+    );
+  
+    await this.page.waitForLoadState('domcontentloaded');
+  
+    await this.screenshot('perfil-colaborador-evento');
+  }
+  
+  async filtrarDataValidaNoPerfil() {
+    await this.page.waitForLoadState('domcontentloaded');
+  
+    const filtroPeriodo = this.page
+      .getByText(/período|periodo/i)
+      .first();
+  
+    const filtroVisivel = await filtroPeriodo
+      .isVisible({ timeout: 8000 })
+      .catch(() => false);
+  
+    if (filtroVisivel) {
+      await filtroPeriodo.click();
+  
+      const botaoAplicar = this.page
+        .getByRole('button', { name: /aplicar/i })
+        .first();
+  
+      const aplicarVisivel = await botaoAplicar
+        .isVisible({ timeout: 8000 })
+        .catch(() => false);
+  
+      if (aplicarVisivel) {
+        await botaoAplicar.click();
+      }
+    } else {
+      console.log(
+        'Filtro Período não encontrado. Seguindo com a data padrão do perfil.'
+      );
+    }
+  
+    await this.page.waitForTimeout(1500);
+  
+    await this.screenshot('data-filtrada-perfil-colaborador');
+  }
+  
+  async clicarAdicionarEvento() {
+    const botaoAdicionarEvento = this.page
+      .getByRole('button', { name: /adicionar evento/i })
+      .first();
+  
+    await expect(botaoAdicionarEvento).toBeVisible({
+      timeout: 60000
+    });
+  
+    await botaoAdicionarEvento.click();
+  
+    await this.screenshot('adicionar-evento-aberto');
+  }
+  
+  async selecionarMarcacaoManual() {
+    const opcaoMarcacaoManual = this.page
+      .getByText(/marcação manual|marcacao manual/i)
+      .first();
+  
+    await expect(opcaoMarcacaoManual).toBeVisible({
+      timeout: 30000
+    });
+  
+    await opcaoMarcacaoManual.click();
+  
+    await this.screenshot('marcacao-manual-selecionada');
+  }
+  
+  async salvarMarcacaoManualSemCamposObrigatorios() {
+    const botaoSalvar = this.page
+      .getByRole('button', { name: /salvar/i })
+      .last();
+  
+    await expect(botaoSalvar).toBeVisible({
+      timeout: 30000
+    });
+  
+    await botaoSalvar.click();
+  
+    await this.page.waitForTimeout(1000);
+  
+    await this.screenshot('marcacao-manual-validacoes');
+  }
+  
+  async validarObrigatoriedadeMarcacaoManual() {
+    const mensagensValidacao = this.page.locator(
+      [
+        '.invalid-feedback',
+        '.text-danger',
+        '.alert-danger',
+        '.help-block',
+        '[role="alert"]',
+        'small'
+      ].join(', ')
+    ).filter({
+      hasText: /obrigatório|obrigatoria|obrigatória|required|campo/i
+    });
+  
+    await expect(mensagensValidacao.first()).toBeVisible({
+      timeout: 30000
+    });
+  
+    const textos = await mensagensValidacao.allTextContents();
+  
+    console.log(
+      'VALIDAÇÕES ENCONTRADAS:',
+      textos
+        .map(texto => texto.trim())
+        .filter(Boolean)
+    );
+  
+    expect(
+      textos
+        .join(' ')
+        .toLowerCase()
+    ).toMatch(/obrigat|required|campo/);
+  
+    await this.screenshot('validacoes-obrigatorias-marcacao-manual');
+  }
 }
