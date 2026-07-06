@@ -2,6 +2,8 @@ import { Page, expect } from '@playwright/test';
 
 import { BasePage } from './BasePage';
 
+import { environment } from '../utils/environment';
+
 export class HomePage extends BasePage {
 
   constructor(page: Page) {
@@ -9,15 +11,25 @@ export class HomePage extends BasePage {
   }
 
   async acessarSite() {
-
-    await this.navegar('https://apponte.me');
-
+  
+    if (environment.isStaging) {
+      await this.navegar(environment.loginUrl);
+      return;
+    }
+  
+    await this.navegar(environment.baseUrl);
+  
     await this.page.waitForLoadState(
       'domcontentloaded'
     );
   }
 
   async validarHomeCarregada() {
+
+    if (environment.isStaging) {
+      await expect(this.page).toHaveURL(/painel\/login/);
+      return;
+    }
 
     await expect(
       this.page.getByRole(

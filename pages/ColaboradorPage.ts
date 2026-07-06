@@ -92,8 +92,21 @@ export class ColaboradorPage extends BasePage {
     const companyId =
       this.extrairCompanyId();
 
-    await this.navegar(
-      `https://www.apponte.me/painel/companies/${companyId}/employees/create`
+      const baseUrl =
+      process.env.PANEL_BASE_URL_STAGING ||
+      'https://staging.apponte.me';
+    
+      await this.navegar(
+        `${baseUrl}/painel/companies/${companyId}/employees/create`
+      );
+
+    console.log(
+      'URL ATUAL:',
+      await this.page.url()
+    );
+    
+    await this.screenshot(
+      'debug-formulario-colaborador'
     );
 
     await expect(
@@ -399,14 +412,18 @@ export class ColaboradorPage extends BasePage {
       companyId = match[1];
     }
   
-    await this.navegar(
-      `https://www.apponte.me/painel/companies/${companyId}/employees`
-    );
+    const baseUrl =
+  process.env.PANEL_BASE_URL_STAGING ||
+  'https://staging.apponte.me';
+
+  await this.navegar(
+    `${baseUrl}/painel/companies/${companyId}/employees/create`
+  );
   
-    await this.page.waitForURL(
-      /\/employees\/?$/,
-      { timeout: 60000 }
-    );
+  await this.page.waitForURL(
+    /\/employees\/?$/,
+    { timeout: 60000 }
+  );
   
     await this.page.waitForLoadState('domcontentloaded');
   
@@ -437,9 +454,13 @@ export class ColaboradorPage extends BasePage {
       throw new Error('Não foi possível capturar o link do perfil do colaborador.');
     }
   
-    const urlPerfil = href.startsWith('http')
-      ? href
-      : `https://www.apponte.me${href}`;
+    const baseUrl =
+  process.env.PANEL_BASE_URL_STAGING ||
+  'https://staging.apponte.me';
+
+const urlPerfil = href.startsWith('http')
+  ? href
+  : `${baseUrl}${href}`;
   
     await this.navegar(urlPerfil);
   
@@ -568,4 +589,5 @@ export class ColaboradorPage extends BasePage {
   
     await this.screenshot('validacoes-obrigatorias-marcacao-manual');
   }
+  
 }

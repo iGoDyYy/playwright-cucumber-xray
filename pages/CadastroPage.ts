@@ -4,6 +4,10 @@ import { BasePage } from './BasePage';
 
 import { MailinatorClient } from '../utils/mailinator/MailinatorClient';
 
+import { MailhogPage } from './MailhogPage';
+
+import { LoginPageStaging } from './LoginPageStaging';
+
 export class CadastroPage extends BasePage {
 
   constructor(page: Page) {
@@ -11,46 +15,32 @@ export class CadastroPage extends BasePage {
     super(page);
   }
 
-  async acessarPaginaCadastro() {
-
+  async acessarPaginaCadastro(urlCadastro?: string) {
     await this.page.goto(
-      'https://cadastro.apponte.me/'
+      urlCadastro || process.env.CADASTRO_URL || 'https://cadastro.apponte.me/'
     );
-
-    await this.page.waitForLoadState(
-      'domcontentloaded'
-    );
-
+  
+    await this.page.waitForLoadState('domcontentloaded');
     await this.page.waitForTimeout(5000);
-
-    const botaoCadastrar = this.page.getByRole(
-      'button',
-      {
-        name: /cadastrar/i
-      }
-    );
-
+  
+    const botaoCadastrar = this.page.getByRole('button', {
+      name: /cadastrar/i
+    });
+  
     await botaoCadastrar.waitFor({
       state: 'visible',
       timeout: 60000
     });
-
-    console.log(
-      'BOTÃO CADASTRAR ENCONTRADO'
-    );
-
+  
+    console.log('BOTÃO CADASTRAR ENCONTRADO');
+  
     await botaoCadastrar.click();
-
+  
     await this.page.waitForTimeout(3000);
-
-    await this.screenshot(
-      'pagina-cadastro'
-    );
-
-    console.log(
-      'URL ATUAL:',
-      await this.page.url()
-    );
+  
+    await this.screenshot('pagina-cadastro');
+  
+    console.log('URL ATUAL:', await this.page.url());
   }
 
   async preencherFormulario(usuario: any) {
@@ -378,9 +368,9 @@ export class CadastroPage extends BasePage {
   private async aguardarMensagemCadastroEnviado() {
 
     await expect(
-      this.page.getByText(
-        /verifique|confirmação|confirmacao|e-mail|email|cadastrado|sucesso|obrigado/i
-      )
+      this.page.getByRole('heading', {
+        name: /verifique seu e-mail/i
+      })
     ).toBeVisible({
       timeout: 60000
     });
@@ -472,4 +462,25 @@ export class CadastroPage extends BasePage {
       'email-validado'
     );
   }
+
+  async validarEmailMailhog(email: string) {
+
+    const mailhogPage = new MailhogPage(this.page);
+  
+    await mailhogPage.acessarMailhog();
+  
+    await mailhogPage.pesquisarEmail(email);
+  
+    await mailhogPage.abrirEmailValidacao(email);
+  
+    await mailhogPage.clicarValidarEmail(email);
+  
+    await mailhogPage.validarRedirecionamentoFinal();
+  
+    await mailhogPage.realizarLoginComUsuarioValidado(
+      email,
+      'Teste@1234'
+    );
+  }
 }
+

@@ -19,7 +19,7 @@ import {
 
 import fs from 'fs';
 
-setDefaultTimeout(120000);
+setDefaultTimeout(300000);
 
 export let browser: Browser;
 
@@ -59,6 +59,12 @@ function prepararPastasDeRelatorio() {
   });
 }
 
+function aguardar(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+let ultimoEnvioEmail = 0;
+
 BeforeAll(async function () {
   prepararPastasDeRelatorio();
 });
@@ -81,6 +87,24 @@ Before(
 
 Before(async function () {
 
+  if (ultimoEnvioEmail > 0) {
+
+    const tempoDecorrido = Date.now() - ultimoEnvioEmail;
+  
+    const tempoMinimo = 180000; // 3 minutos
+  
+    if (tempoDecorrido < tempoMinimo) {
+  
+      const restante = tempoMinimo - tempoDecorrido;
+  
+      console.log(
+        `⏳ Aguardando ${Math.ceil(restante / 1000)} segundos antes do próximo cenário...`
+      );
+  
+      await aguardar(restante);
+    }
+  }
+
   browser = await chromium.launch({
 
     headless: process.env.CI === 'true',
@@ -96,11 +120,18 @@ Before(async function () {
       width: 1920,
       height: 1080
     },
-
+  
+    httpCredentials: process.env.MAILHOG_USER && process.env.MAILHOG_PASSWORD
+      ? {
+          username: process.env.MAILHOG_USER,
+          password: process.env.MAILHOG_PASSWORD
+        }
+      : undefined,
+  
     recordVideo: {
-
+  
       dir: 'reports/videos',
-
+  
       size: {
         width: 1920,
         height: 1080
@@ -144,4 +175,5 @@ After(async function (scenario) {
   if (browser) {
     await browser.close();
   }
+
 });

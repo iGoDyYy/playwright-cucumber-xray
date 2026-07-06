@@ -132,3 +132,5 @@ Then(
     await colaboradorPage.validarObrigatoriedadeMarcacaoManual();
   }
 );
+
+

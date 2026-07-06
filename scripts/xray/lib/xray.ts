@@ -129,3 +129,59 @@ export async function adicionarPreconditionsAoTest(
     }
   `);
 }
+
+export async function adicionarPassoManualAoTest(
+  testIssueId: string,
+  action: string,
+  data: string,
+  result: string
+) {
+  const safeAction = JSON.stringify(action);
+  const safeData = JSON.stringify(data || '');
+  const safeResult = JSON.stringify(result || '');
+
+  return graphql(`
+    mutation {
+      addTestStep(
+        issueId: "${testIssueId}",
+        step: {
+          action: ${safeAction},
+          data: ${safeData},
+          result: ${safeResult}
+        }
+      ) {
+        id
+        action
+        data
+        result
+      }
+    }
+  `);
+}
+
+export async function atualizarDefinicaoManualPrecondition(
+  preconditionIssueId: string,
+  definition: string
+) {
+  const response = await graphql(`
+    mutation {
+      updatePrecondition(
+        issueId: "${preconditionIssueId}",
+        data: {
+          definition: ${JSON.stringify(definition)}
+        }
+      ) {
+        issueId
+        definition
+      }
+    }
+`);
+
+console.log(
+  'RESPOSTA UPDATE PRECONDITION:',
+  JSON.stringify(response, null, 2)
+);
+
+return response;
+
+}

@@ -2,6 +2,8 @@ import { Page, expect } from '@playwright/test';
 
 import { BasePage } from './BasePage';
 
+import { environment } from '../utils/environment';
+
 export class LoginPage extends BasePage {
 
   constructor(page: Page) {
@@ -11,30 +13,47 @@ export class LoginPage extends BasePage {
 
   async acessarPainel() {
 
+    if (environment.isStaging) {
+  
+      await this.navegar(
+        environment.loginUrl
+      );
+  
+      await this.screenshot(
+        'pagina-login-staging'
+      );
+  
+      return;
+    }
+  
+    await this.navegar(
+      environment.baseUrl
+    );
+  
     await this.page.waitForLoadState(
       'domcontentloaded'
     );
-
+  
     const botaoPainel = this.page.getByRole(
       'link',
       { name: /painel/i }
     );
-
+  
     await this.clicar(botaoPainel);
-
+  
     await this.page.waitForLoadState(
       'domcontentloaded'
     );
-
+  
     await this.screenshot(
-      'pagina-login'
+      'pagina-login-producao'
     );
   }
 
   async informarCredenciaisValidas() {
 
-    const email = process.env.EMAIL_LOGIN;
-    const senha = process.env.PASSWORD_LOGIN;
+    const email = environment.email;
+    const senha = environment.password;
 
     if (!email || !senha) {
 
