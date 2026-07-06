@@ -13,7 +13,9 @@
   "test:colaborador": "cucumber-js --tags \"@colaborador-cadastro\" --format json:reports/cucumber-report.json",
   "test:colaborador:real": "cucumber-js --tags \"@colaborador-cadastro\" --format json:reports/cucumber-report.json",
   "test:colaborador:preview": "cucumber-js --tags \"@colaborador-preview\" --format json:reports/cucumber-report.json",
-  "test:colaborador:evento": "cucumber-js --tags \"@colaborador-evento\" --format json:reports/cucumber-report.json"
+  "test:colaborador:evento": "cucumber-js --tags \"@colaborador-evento\" --format json:reports/cucumber-report.json",
+  "test:responsavel-fiscal": "cucumber-js --tags \"@responsavel-fiscal\" --format json:reports/cucumber-report.json",
+  "xray:responsavel-fiscal": "ts-node scripts/xray/runResponsavelFiscalAndPublish.ts"
 },
   "keywords": [],
   "author": "",
