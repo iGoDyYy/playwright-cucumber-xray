@@ -21,10 +21,17 @@ async function main() {
     const cucumberScenarios = carregarCucumberReport();
 
     const testsPayload = executionData.tests.map(test => {
-      const scenarioResult = cucumberScenarios.find(scenario =>
-        normalize(scenario.name) === normalize(test.name)
-      );
 
+      console.log('TESTE XRAY:', test);
+      console.log('NOME TESTE:', test.name);
+    
+      const scenarioResult = cucumberScenarios.find(scenario => {
+    
+        console.log('CENÁRIO CUCUMBER:', scenario.name);
+    
+        return normalize(scenario.name) === normalize(test.name);
+      });
+    
       if (!scenarioResult) {
         return {
           testKey: test.key,
@@ -32,9 +39,9 @@ async function main() {
           comment: `Cenário "${test.name}" não encontrado no relatório Cucumber.`
         };
       }
-
+    
       const status = getScenarioStatus(scenarioResult);
-
+    
       return {
         testKey: test.key,
         status,
@@ -67,7 +74,7 @@ async function main() {
     console.log(JSON.stringify(response.data, null, 2));
   } catch (error: any) {
     console.log('ERRO AO PUBLICAR RELATÓRIO CUCUMBER NO XRAY');
-    console.log(error?.response?.data || error.message);
+    console.error(error);
     process.exit(1);
   }
 }

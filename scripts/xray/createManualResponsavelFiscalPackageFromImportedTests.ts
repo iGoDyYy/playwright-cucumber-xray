@@ -4,6 +4,10 @@ import {
     criarIssueLink,
     issueTypes
   } from './lib/jira';
+
+  import {
+    salvarExecutionData
+  } from './lib/execution';
   
   import {
     adicionarPreconditionsAoTest,
@@ -379,6 +383,22 @@ import {
       await criarIssueLink(developmentIssueKey, precondition.key);
     }
   
+    salvarExecutionData({
+      featurePath: 'features/responsavel-fiscal.feature',
+      tests: testsEncontrados.map(test => ({
+        id: test.id,
+        key: test.key,
+        name: `TCID ${test.tcid} - ${test.summary}`
+      })),
+      testSet,
+      testPlan,
+      testExecution: {
+        id: testExecution.issueId,
+        key: testExecution.issueKey
+      }
+    });
+
+
     console.log('PACOTE MANUAL DE RESPONSÁVEL FISCAL CRIADO COM SUCESSO');
   
     console.log(JSON.stringify({

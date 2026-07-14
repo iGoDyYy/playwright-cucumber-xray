@@ -1,36 +1,43 @@
-import { execSync } from 'child_process';
+import { Logger } from "../../utils/Logger";
+import { execSync } from "child_process";
 
 async function main() {
 
-  try {
+    Logger.title("PIPELINE RESPONSÁVEL FISCAL");
 
-    console.log('Executando testes do Responsável Fiscal...');
+    try {
+
+        Logger.section("Executando testes");
+
+        execSync(
+            "npm run test:responsavel-fiscal",
+            {
+                stdio: "inherit"
+            }
+        );
+
+        Logger.success("Todos os testes foram executados.");
+
+    } catch {
+
+        Logger.warning(
+            "Os testes finalizaram com falha. O resultado será publicado no Xray mesmo assim."
+        );
+
+    }
+
+    Logger.section("Publicando resultados no Xray");
 
     execSync(
-      'npm run test:responsavel-fiscal',
-      {
-        stdio: 'inherit'
-      }
+        "npx ts-node scripts/xray/publishCucumberReportToXray.ts",
+        {
+            stdio: "inherit"
+        }
     );
 
-  } catch {
+    Logger.success("Resultados publicados com sucesso.");
 
-    console.log(
-      'Execução Cucumber finalizou com falha. Publicando resultado mesmo assim...'
-    );
-
-  }
-
-  console.log(
-    'Publicando resultado individual no Xray...'
-  );
-
-  execSync(
-    'npx ts-node scripts/xray/publishCucumberReportToXray.ts',
-    {
-      stdio: 'inherit'
-    }
-  );
+    Logger.separator();
 
 }
 

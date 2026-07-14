@@ -1,249 +1,62 @@
 {
-  "featurePath": "manual/rotinas",
-  "mode": "manual",
-  "module": "rotinas",
-  "developmentIssueKey": "AP-1",
-  "preconditions": [
-    {
-      "id": "10222",
-      "key": "QA-186",
-      "code": "PC-01"
-    },
-    {
-      "id": "10223",
-      "key": "QA-187",
-      "code": "PC-02"
-    },
-    {
-      "id": "10224",
-      "key": "QA-188",
-      "code": "PC-03"
-    },
-    {
-      "id": "10225",
-      "key": "QA-189",
-      "code": "PC-07"
-    }
-  ],
+  "featurePath": "features/responsavel-fiscal.feature",
   "tests": [
     {
-      "id": "10226",
-      "key": "QA-190",
-      "tcid": 1,
-      "preconditionCode": "PC-01",
-      "steps": [
-        {
-          "action": "Acesse a página inicial do painel administrativo."
-        },
-        {
-          "action": "Localize a aba \"Rotinas\" no menu lateral esquerdo.",
-          "result": "A aba \"Rotinas\" é exibida corretamente no menu lateral esquerdo do painel administrativo."
-        }
-      ]
+      "id": "10425",
+      "key": "QA-359",
+      "name": "TCID 1 - Validar responsavel fiscal pela aba de colaboradores"
     },
     {
-      "id": "10227",
-      "key": "QA-191",
-      "tcid": 2,
-      "preconditionCode": "PC-01",
-      "steps": [
-        {
-          "action": "Acesse a página inicial do painel administrativo."
-        },
-        {
-          "action": "Localize a aba \"Rotinas\" no menu lateral esquerdo."
-        },
-        {
-          "action": "Clique na aba \"Rotinas\".",
-          "result": "O usuário é redirecionado corretamente para a página de Rotinas."
-        }
-      ]
+      "id": "10427",
+      "key": "QA-360",
+      "name": "TCID 2 - Validar responsavel fiscal pela aba de dados fiscais"
     },
     {
-      "id": "10228",
-      "key": "QA-192",
-      "tcid": 3,
-      "preconditionCode": "PC-02",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Observe a área localizada acima do botão \"Marcação manual\".",
-          "result": "O botão \"Período\" é exibido corretamente acima do botão \"Marcação manual\"."
-        }
-      ]
+      "id": "10429",
+      "key": "QA-361",
+      "name": "TCID 3 - Exibição do pop-up após clicar em Validar e-mail"
     },
     {
-      "id": "10229",
-      "key": "QA-193",
-      "tcid": 4,
-      "preconditionCode": "PC-02",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Observe a área localizada abaixo do botão \"Período\".",
-          "result": "O botão \"Marcação manual\" é exibido corretamente abaixo do botão \"Período\"."
-        }
-      ]
+      "id": "10431",
+      "key": "QA-362",
+      "name": "TCID 4 - Conteúdo do pop-up exibido"
     },
     {
-      "id": "10230",
-      "key": "QA-194",
-      "tcid": 5,
-      "preconditionCode": "PC-02",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Observe a área localizada abaixo do botão \"Marcação manual\".",
-          "result": "O botão \"Ausência\" é exibido corretamente abaixo do botão \"Marcação manual\"."
-        }
-      ]
+      "id": "10433",
+      "key": "QA-363",
+      "name": "TCID 5 - Receber o e-mail de validação no endereço informado"
     },
     {
-      "id": "10231",
-      "key": "QA-195",
-      "tcid": 6,
-      "preconditionCode": "PC-02",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Clique no botão \"Período\".",
-          "result": "Os dois calendários são exibidos corretamente, permitindo a seleção do período desejado."
-        }
-      ]
+      "id": "10435",
+      "key": "QA-364",
+      "name": "TCID 6 - Validar e-mail clicando no botão dentro da mensagem recebida"
     },
     {
-      "id": "10232",
-      "key": "QA-196",
-      "tcid": 7,
-      "preconditionCode": "PC-02",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Clique no botão \"Marcação manual\".",
-          "result": "Os campos Tipo de marcação, Horário da marcação e Motivo são exibidos corretamente."
-        }
-      ]
+      "id": "10437",
+      "key": "QA-365",
+      "name": "TCID 7 - Exibir mensagem de confirmação após validação"
     },
     {
-      "id": "10233",
-      "key": "QA-197",
-      "tcid": 8,
-      "preconditionCode": "PC-07",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Clique no botão \"Período\"."
-        },
-        {
-          "action": "Selecione uma data inicial e uma data final nos calendários exibidos."
-        },
-        {
-          "action": "Confirme a seleção do período clicando em Aplicar.",
-          "result": "O período é filtrado corretamente, exibindo apenas os registros correspondentes ao intervalo selecionado."
-        }
-      ]
+      "id": "10439",
+      "key": "QA-366",
+      "name": "TCID 8 - Confirmar que responsável fiscal aparece como validado após a confirmação"
     },
     {
-      "id": "10234",
-      "key": "QA-198",
-      "tcid": 9,
-      "preconditionCode": "PC-03",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Clique no botão \"Período\"."
-        },
-        {
-          "action": "Selecione uma data inicial e uma data final."
-        },
-        {
-          "action": "Confirme a seleção do período clicando em Aplicar."
-        },
-        {
-          "action": "Clique no botão \"Marcação manual\"."
-        },
-        {
-          "action": "Selecione o Tipo de marcação como Entrada."
-        },
-        {
-          "action": "Informe o horário da marcação."
-        },
-        {
-          "action": "Informe o motivo da marcação manual."
-        },
-        {
-          "action": "Selecione o colaborador desejado."
-        },
-        {
-          "action": "Clique em Salvar.",
-          "result": "A marcação manual do tipo Entrada é registrada corretamente para o colaborador selecionado."
-        }
-      ]
-    },
-    {
-      "id": "10235",
-      "key": "QA-199",
-      "tcid": 10,
-      "preconditionCode": "PC-03",
-      "steps": [
-        {
-          "action": "Acesse a página de \"Rotinas\"."
-        },
-        {
-          "action": "Clique no botão \"Período\"."
-        },
-        {
-          "action": "Selecione uma data inicial e uma data final."
-        },
-        {
-          "action": "Confirme a seleção do período clicando em Aplicar."
-        },
-        {
-          "action": "Clique no botão \"Marcação manual\"."
-        },
-        {
-          "action": "Selecione o Tipo de marcação como Saída para o almoço."
-        },
-        {
-          "action": "Informe o horário da marcação."
-        },
-        {
-          "action": "Informe o motivo da marcação manual."
-        },
-        {
-          "action": "Selecione o colaborador desejado."
-        },
-        {
-          "action": "Clique em Salvar.",
-          "result": "A marcação manual do tipo Saída para o almoço é registrada corretamente para o colaborador selecionado."
-        }
-      ]
+      "id": "10441",
+      "key": "QA-367",
+      "name": "TCID 9 - Garantir que mensagens de aviso não sejam mais exibidas após validação"
     }
   ],
   "testSet": {
-    "id": "10202",
-    "key": "QA-166"
+    "id": "10453",
+    "key": "QA-373"
   },
   "testPlan": {
-    "id": "10203",
-    "key": "QA-167"
+    "id": "10455",
+    "key": "QA-374"
   },
   "testExecution": {
-    "id": "10238",
-    "key": "QA-202"
+    "id": "10460",
+    "key": "QA-377"
   }
 }
