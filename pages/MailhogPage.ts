@@ -6,16 +6,32 @@ export class MailhogPage {
 
   async acessarMailhog() {
 
-    await this.page.goto(
-      process.env.MAILHOG_URL || 'https://mailhog.apponte.me/'
-    );
-
+    const url =
+      process.env.MAILHOG_URL || 'https://mailhog.apponte.me/';
+  
+    await this.page.goto(url);
+  
     await this.page.waitForLoadState('domcontentloaded');
+  
+    console.log(
+      'MAILHOG URL ATUAL:',
+      await this.page.url()
+    );
+  
+    await this.page.screenshot({
+      path: 'reports/screenshots/mailhog-home.png',
+      fullPage: true
+    });
   }
 
   async pesquisarEmail(email: string) {
 
     const campoBusca = this.page.locator('input').first();
+
+    console.log(
+      'TOTAL INPUTS:',
+      await this.page.locator('input').count()
+    );
   
     await campoBusca.waitFor({
       state: 'visible',
