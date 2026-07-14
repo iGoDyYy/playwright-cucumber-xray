@@ -13,10 +13,14 @@ export class MailhogPage {
   
     await this.page.waitForLoadState('domcontentloaded');
   
-    console.log(
-      'MAILHOG URL ATUAL:',
-      await this.page.url()
-    );
+    console.log('MAILHOG URL ATUAL:', await this.page.url());
+  
+    console.log('TÍTULO:', await this.page.title());
+  
+    const body = await this.page.locator('body').innerText();
+  
+    console.log('BODY DA PÁGINA:');
+    console.log(body);
   
     await this.page.screenshot({
       path: 'reports/screenshots/mailhog-home.png',
