@@ -118,27 +118,29 @@ export class MailhogPage {
       );
     }
   
+    const mailhogUrl =
+      process.env.MAILHOG_URL ||
+      "https://mailhog.apponte.me";
+  
     await this.page.goto(
-      `${process.env.MAILHOG_URL}${href}`
+      `${mailhogUrl}${href}`
     );
   
-    await this.page.waitForLoadState(
-      'domcontentloaded'
-    );
+    await this.page.waitForLoadState("domcontentloaded");
   
     await this.page.waitForTimeout(3000);
   
     console.log(
-      'URL APÓS ABRIR E-MAIL:',
+      "URL APÓS ABRIR E-MAIL:",
       await this.page.url()
     );
   
     await this.page.screenshot({
-      path: 'reports/screenshots/mailhog-apos-abrir-email.png',
+      path: "reports/screenshots/mailhog-apos-abrir-email.png",
       fullPage: true
     });
   }
-
+  
   async clicarValidarEmail(email: string) {
 
     await this.page.waitForTimeout(2000);
