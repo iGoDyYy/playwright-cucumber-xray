@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/xray-automation
+
   pull_request:
     branches:
       - main
@@ -43,13 +44,14 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Criar pastas reports
+        shell: bash
         run: |
           mkdir -p reports
           mkdir -p reports/screenshots
           mkdir -p reports/videos
           mkdir -p reports/html-report
           mkdir -p screenshots
-      
+
       - name: Validar variáveis ambiente
         shell: bash
         run: |
@@ -59,8 +61,9 @@ jobs:
           echo "MAILHOG_PASSWORD: ${MAILHOG_PASSWORD:+OK}"
           echo "XRAY_CLIENT_ID_TEST_NOVO: ${XRAY_CLIENT_ID_TEST_NOVO:+OK}"
           echo "XRAY_CLIENT_SECRET_TEST_NOVO: ${XRAY_CLIENT_SECRET_TEST_NOVO:+OK}"
-      
+
       - name: Diagnóstico dos Secrets
+        shell: bash
         run: |
           echo "========== DIAGNÓSTICO =========="
           echo "EMAIL_LOGIN definido? $([ -n "$EMAIL_LOGIN" ] && echo SIM || echo NAO)"
@@ -70,7 +73,7 @@ jobs:
           echo "XRAY_CLIENT_ID_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_ID_TEST_NOVO" ] && echo SIM || echo NAO)"
           echo "XRAY_CLIENT_SECRET_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_SECRET_TEST_NOVO" ] && echo SIM || echo NAO)"
           echo "================================"
-      
+
       - name: Executar testes cadastro
         run: npm run test:cadastro
 
