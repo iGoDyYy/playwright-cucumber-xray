@@ -49,17 +49,17 @@ jobs:
           mkdir -p reports/videos
           mkdir -p reports/html-report
           mkdir -p screenshots
-
-          - name: Validar variáveis ambiente
-          shell: bash
-          run: |
-            echo "EMAIL_LOGIN: ${EMAIL_LOGIN:+OK}"
-            echo "PASSWORD_LOGIN: ${PASSWORD_LOGIN:+OK}"
-            echo "MAILHOG_USER: ${MAILHOG_USER:+OK}"
-            echo "MAILHOG_PASSWORD: ${MAILHOG_PASSWORD:+OK}"
-            echo "XRAY_CLIENT_ID_TEST_NOVO: ${XRAY_CLIENT_ID_TEST_NOVO:+OK}"
-            echo "XRAY_CLIENT_SECRET_TEST_NOVO: ${XRAY_CLIENT_SECRET_TEST_NOVO:+OK}"
-
+      
+      - name: Validar variáveis ambiente
+        shell: bash
+        run: |
+          echo "EMAIL_LOGIN: ${EMAIL_LOGIN:+OK}"
+          echo "PASSWORD_LOGIN: ${PASSWORD_LOGIN:+OK}"
+          echo "MAILHOG_USER: ${MAILHOG_USER:+OK}"
+          echo "MAILHOG_PASSWORD: ${MAILHOG_PASSWORD:+OK}"
+          echo "XRAY_CLIENT_ID_TEST_NOVO: ${XRAY_CLIENT_ID_TEST_NOVO:+OK}"
+          echo "XRAY_CLIENT_SECRET_TEST_NOVO: ${XRAY_CLIENT_SECRET_TEST_NOVO:+OK}"
+      
       - name: Diagnóstico dos Secrets
         run: |
           echo "========== DIAGNÓSTICO =========="
@@ -70,7 +70,7 @@ jobs:
           echo "XRAY_CLIENT_ID_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_ID_TEST_NOVO" ] && echo SIM || echo NAO)"
           echo "XRAY_CLIENT_SECRET_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_SECRET_TEST_NOVO" ] && echo SIM || echo NAO)"
           echo "================================"
-
+      
       - name: Executar testes cadastro
         run: npm run test:cadastro
 
