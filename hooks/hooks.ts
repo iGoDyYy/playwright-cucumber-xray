@@ -114,6 +114,12 @@ Before(async function () {
     ]
   });
 
+  console.log("MAILHOG_USER:", process.env.MAILHOG_USER);
+console.log(
+  "MAILHOG_PASSWORD:",
+  process.env.MAILHOG_PASSWORD ? "***OK***" : "UNDEFINED"
+);
+
   context = await browser.newContext({
 
     viewport: {
