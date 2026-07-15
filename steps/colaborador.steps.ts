@@ -1,4 +1,5 @@
 import {
+  Given,
   When,
   Then
 } from '@cucumber/cucumber';
@@ -80,3 +81,56 @@ Then(
       .validarFormularioProntoParaSalvar();
   }
 );
+
+Given(
+  'acesso a aba Colaboradores',
+  async () => {
+    colaboradorPage = new ColaboradorPage(page);
+
+    await colaboradorPage.acessarAbaColaboradores();
+  }
+);
+
+Given(
+  'acesso o perfil de um colaborador',
+  async () => {
+    await colaboradorPage.acessarPerfilPrimeiroColaborador();
+  }
+);
+
+Given(
+  'filtro uma data válida no perfil do colaborador',
+  async () => {
+    await colaboradorPage.filtrarDataValidaNoPerfil();
+  }
+);
+
+When(
+  'clico no botão Adicionar evento',
+  async () => {
+    await colaboradorPage.clicarAdicionarEvento();
+  }
+);
+
+When(
+  'seleciono a opção Marcação manual',
+  async () => {
+    await colaboradorPage.selecionarMarcacaoManual();
+  }
+);
+
+When(
+  'tento salvar a marcação manual sem preencher os campos obrigatórios',
+  async () => {
+    await colaboradorPage.salvarMarcacaoManualSemCamposObrigatorios();
+  }
+);
+
+Then(
+  'o sistema deve exibir as validações obrigatórias da marcação manual',
+  async () => {
+    await colaboradorPage.validarObrigatoriedadeMarcacaoManual();
+  }
+);
+
+

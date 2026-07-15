@@ -30,3 +30,16 @@ Funcionalidade: Cadastro de colaborador no painel
     Quando acesso o formulário de novo colaborador
     E preencho os dados do novo colaborador
     Entao o formulário de colaborador deve estar pronto para salvar
+
+@colaborador-evento
+@marcacao-manual
+@validacao
+Cenario: Validar obrigatoriedade simultânea dos campos obrigatórios em marcação manual
+
+  E acesso a aba Colaboradores
+  E acesso o perfil de um colaborador
+  E filtro uma data válida no perfil do colaborador
+  Quando clico no botão Adicionar evento
+  E seleciono a opção Marcação manual
+  E tento salvar a marcação manual sem preencher os campos obrigatórios
+  Então o sistema deve exibir as validações obrigatórias da marcação manual

@@ -1,0 +1,62 @@
+{
+  "featurePath": "features/responsavel-fiscal.feature",
+  "tests": [
+    {
+      "id": "10425",
+      "key": "QA-359",
+      "name": "TCID 1 - Validar responsavel fiscal pela aba de colaboradores"
+    },
+    {
+      "id": "10427",
+      "key": "QA-360",
+      "name": "TCID 2 - Validar responsavel fiscal pela aba de dados fiscais"
+    },
+    {
+      "id": "10429",
+      "key": "QA-361",
+      "name": "TCID 3 - Exibição do pop-up após clicar em Validar e-mail"
+    },
+    {
+      "id": "10431",
+      "key": "QA-362",
+      "name": "TCID 4 - Conteúdo do pop-up exibido"
+    },
+    {
+      "id": "10433",
+      "key": "QA-363",
+      "name": "TCID 5 - Receber o e-mail de validação no endereço informado"
+    },
+    {
+      "id": "10435",
+      "key": "QA-364",
+      "name": "TCID 6 - Validar e-mail clicando no botão dentro da mensagem recebida"
+    },
+    {
+      "id": "10437",
+      "key": "QA-365",
+      "name": "TCID 7 - Exibir mensagem de confirmação após validação"
+    },
+    {
+      "id": "10439",
+      "key": "QA-366",
+      "name": "TCID 8 - Confirmar que responsável fiscal aparece como validado após a confirmação"
+    },
+    {
+      "id": "10441",
+      "key": "QA-367",
+      "name": "TCID 9 - Garantir que mensagens de aviso não sejam mais exibidas após validação"
+    }
+  ],
+  "testSet": {
+    "id": "10453",
+    "key": "QA-373"
+  },
+  "testPlan": {
+    "id": "10455",
+    "key": "QA-374"
+  },
+  "testExecution": {
+    "id": "10460",
+    "key": "QA-377"
+  }
+}

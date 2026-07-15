@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+      - feature/xray-automation
+
   pull_request:
     branches:
       - main
@@ -12,19 +14,21 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-
   teste:
-
     runs-on: ubuntu-latest
-
     timeout-minutes: 60
 
     env:
       EMAIL_LOGIN: ${{ secrets.EMAIL_LOGIN }}
       PASSWORD_LOGIN: ${{ secrets.PASSWORD_LOGIN }}
 
-    steps:
+      MAILHOG_USER: ${{ secrets.MAILHOG_USER }}
+      MAILHOG_PASSWORD: ${{ secrets.MAILHOG_PASSWORD }}
 
+      XRAY_CLIENT_ID_TEST_NOVO: ${{ secrets.XRAY_CLIENT_ID_TEST_NOVO }}
+      XRAY_CLIENT_SECRET_TEST_NOVO: ${{ secrets.XRAY_CLIENT_SECRET_TEST_NOVO }}
+
+    steps:
       - name: Checkout projeto
         uses: actions/checkout@v4
 
@@ -40,6 +44,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Criar pastas reports
+        shell: bash
         run: |
           mkdir -p reports
           mkdir -p reports/screenshots
@@ -48,25 +53,33 @@ jobs:
           mkdir -p screenshots
 
       - name: Validar variáveis ambiente
+        shell: bash
         run: |
-          echo "EMAIL_LOGIN existe?"
-          if [ -z "$EMAIL_LOGIN" ]; then
-            echo "EMAIL_LOGIN NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "EMAIL_LOGIN OK"
-          fi
+          echo "EMAIL_LOGIN: ${EMAIL_LOGIN:+OK}"
+          echo "PASSWORD_LOGIN: ${PASSWORD_LOGIN:+OK}"
+          echo "MAILHOG_USER: ${MAILHOG_USER:+OK}"
+          echo "MAILHOG_PASSWORD: ${MAILHOG_PASSWORD:+OK}"
+          echo "XRAY_CLIENT_ID_TEST_NOVO: ${XRAY_CLIENT_ID_TEST_NOVO:+OK}"
+          echo "XRAY_CLIENT_SECRET_TEST_NOVO: ${XRAY_CLIENT_SECRET_TEST_NOVO:+OK}"
 
-          echo "PASSWORD_LOGIN existe?"
-          if [ -z "$PASSWORD_LOGIN" ]; then
-            echo "PASSWORD_LOGIN NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "PASSWORD_LOGIN OK"
-          fi
+      - name: Diagnóstico dos Secrets
+        shell: bash
+        run: |
+          echo "========== DIAGNÓSTICO =========="
+          echo "EMAIL_LOGIN definido? $([ -n "$EMAIL_LOGIN" ] && echo SIM || echo NAO)"
+          echo "PASSWORD_LOGIN definido? $([ -n "$PASSWORD_LOGIN" ] && echo SIM || echo NAO)"
+          echo "MAILHOG_USER definido? $([ -n "$MAILHOG_USER" ] && echo SIM || echo NAO)"
+          echo "MAILHOG_PASSWORD definido? $([ -n "$MAILHOG_PASSWORD" ] && echo SIM || echo NAO)"
+          echo "XRAY_CLIENT_ID_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_ID_TEST_NOVO" ] && echo SIM || echo NAO)"
+          echo "XRAY_CLIENT_SECRET_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_SECRET_TEST_NOVO" ] && echo SIM || echo NAO)"
+          echo "================================"
 
-      - name: Executar testes
-        run: npm test
+      - name: Executar testes cadastro
+        run: npm run test:cadastro
+
+      - name: Publicar resultado no Xray
+        if: always()
+        run: npx ts-node scripts/xray/publishCucumberReportToXray.ts
 
       - name: Gerar HTML Report
         if: always()

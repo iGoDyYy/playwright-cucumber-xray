@@ -15,122 +15,78 @@ let cadastroPage: CadastroPage;
 let usuario: any;
 
 Given(
-  'que acesso a página de cadastro',
+  'que acesso a página de cadastro produção',
   async () => {
+    cadastroPage = new CadastroPage(page);
 
-    cadastroPage =
-      new CadastroPage(page);
+    await cadastroPage.acessarPaginaCadastro(
+      process.env.CADASTRO_URL || 'https://cadastro.apponte.me/'
+    );
+  }
+);
 
-    await cadastroPage
-      .acessarPaginaCadastro();
+Given(
+  'que acesso a página de cadastro staging',
+  async () => {
+    cadastroPage = new CadastroPage(page);
+
+    await cadastroPage.acessarPaginaCadastro(
+      process.env.CADASTRO_URL_STAGING || 'https://cadastro-staging.apponte.me/'
+    );
   }
 );
 
 When(
   'preencho os dados do novo usuário',
   async () => {
+    usuario = UserFactory.criarUsuario();
 
-    usuario =
-      UserFactory.criarUsuario();
+    console.log('USUÁRIO GERADO:', usuario);
 
-    console.log(
-      'USUÁRIO GERADO:',
-      usuario
-    );
-
-    await cadastroPage
-      .preencherFormulario(usuario);
+    await cadastroPage.preencherFormulario(usuario);
   }
 );
 
-When(
-  'confirmo o cadastro',
-  async () => {
+When('confirmo o cadastro', async () => {
+  await cadastroPage.confirmarCadastro();
+});
 
-    await cadastroPage
-      .confirmarCadastro();
-  }
-);
+When('preencho os dados de endereço', async () => {
+  await cadastroPage.preencherEndereco(usuario);
+});
 
-When(
-  'preencho os dados de endereço',
-  async () => {
+When('confirmo o endereço', async () => {
+  await cadastroPage.confirmarEndereco();
+});
 
-    await cadastroPage
-      .preencherEndereco(usuario);
-  }
-);
+When('preencho os documentos da empresa', async () => {
+  await cadastroPage.preencherDocumentos(usuario);
+});
 
-When(
-  'confirmo o endereço',
-  async () => {
+When('confirmo os documentos', async () => {
+  await cadastroPage.confirmarDocumentos();
+});
 
-    await cadastroPage
-      .confirmarEndereco();
-  }
-);
+When('preencho os termos', async () => {
+  await cadastroPage.preencherTermos();
+});
 
-When(
-  'preencho os documentos da empresa',
-  async () => {
+When('confirmo os termos', async () => {
+  await cadastroPage.confirmarTermos();
+});
 
-    await cadastroPage
-      .preencherDocumentos(usuario);
-  }
-);
+Then('o cadastro deve estar pronto para conclusão', async () => {
+  await cadastroPage.validarCadastroProntoParaConclusao();
+});
 
-When(
-  'confirmo os documentos',
-  async () => {
+Then('o usuário deve ser cadastrado com sucesso', async () => {
+  await cadastroPage.validarCadastroSucesso();
+});
 
-    await cadastroPage
-      .confirmarDocumentos();
-  }
-);
+Then('valido o email enviado', async () => {
+  await cadastroPage.validarEmailMailinator(usuario.email);
+});
 
-When(
-  'preencho os termos',
-  async () => {
-
-    await cadastroPage
-      .preencherTermos();
-  }
-);
-
-When(
-  'confirmo os termos',
-  async () => {
-
-    await cadastroPage
-      .confirmarTermos();
-  }
-);
-
-Then(
-  'o cadastro deve estar pronto para conclusão',
-  async () => {
-
-    await cadastroPage
-      .validarCadastroProntoParaConclusao();
-  }
-);
-
-Then(
-  'o usuário deve ser cadastrado com sucesso',
-  async () => {
-
-    await cadastroPage
-      .validarCadastroSucesso();
-  }
-);
-
-Then(
-  'valido o email enviado',
-  async () => {
-
-    await cadastroPage
-      .validarEmailMailinator(
-        usuario.email
-      );
-  }
-);
+Then('valido o email enviado no mailhog', async () => {
+  await cadastroPage.validarEmailMailhog(usuario.email);
+});
