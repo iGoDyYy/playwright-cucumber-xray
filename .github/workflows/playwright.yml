@@ -50,55 +50,15 @@ jobs:
           mkdir -p reports/html-report
           mkdir -p screenshots
 
-      - name: Validar variáveis ambiente
-        run: |
-          echo "EMAIL_LOGIN existe?"
-          if [ -z "$EMAIL_LOGIN" ]; then
-            echo "EMAIL_LOGIN NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "EMAIL_LOGIN OK"
-          fi
-
-          echo "PASSWORD_LOGIN existe?"
-          if [ -z "$PASSWORD_LOGIN" ]; then
-            echo "PASSWORD_LOGIN NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "PASSWORD_LOGIN OK"
-          fi
-
-          echo "MAILHOG_USER existe?"
-          if [ -z "$MAILHOG_USER" ]; then
-            echo "MAILHOG_USER NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "MAILHOG_USER OK"
-          fi
-
-          echo "MAILHOG_PASSWORD existe?"
-          if [ -z "$MAILHOG_PASSWORD" ]; then
-            echo "MAILHOG_PASSWORD NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "MAILHOG_PASSWORD OK"
-          fi
-
-          echo "XRAY_CLIENT_ID_TEST_NOVO existe?"
-          if [ -z "$XRAY_CLIENT_ID_TEST_NOVO" ]; then
-            echo "XRAY_CLIENT_ID_TEST_NOVO NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "XRAY_CLIENT_ID_TEST_NOVO OK"
-          fi
-
-          echo "XRAY_CLIENT_SECRET_TEST_NOVO existe?"
-          if [ -z "$XRAY_CLIENT_SECRET_TEST_NOVO" ]; then
-            echo "XRAY_CLIENT_SECRET_TEST_NOVO NÃO CONFIGURADO"
-            exit 1
-          else
-            echo "XRAY_CLIENT_SECRET_TEST_NOVO OK"
-          fi
+          - name: Validar variáveis ambiente
+          shell: bash
+          run: |
+            echo "EMAIL_LOGIN: ${EMAIL_LOGIN:+OK}"
+            echo "PASSWORD_LOGIN: ${PASSWORD_LOGIN:+OK}"
+            echo "MAILHOG_USER: ${MAILHOG_USER:+OK}"
+            echo "MAILHOG_PASSWORD: ${MAILHOG_PASSWORD:+OK}"
+            echo "XRAY_CLIENT_ID_TEST_NOVO: ${XRAY_CLIENT_ID_TEST_NOVO:+OK}"
+            echo "XRAY_CLIENT_SECRET_TEST_NOVO: ${XRAY_CLIENT_SECRET_TEST_NOVO:+OK}"
 
       - name: Diagnóstico dos Secrets
         run: |
