@@ -100,6 +100,17 @@ jobs:
             echo "XRAY_CLIENT_SECRET_TEST_NOVO OK"
           fi
 
+      - name: Diagnóstico dos Secrets
+        run: |
+          echo "========== DIAGNÓSTICO =========="
+          echo "EMAIL_LOGIN definido? $([ -n "$EMAIL_LOGIN" ] && echo SIM || echo NAO)"
+          echo "PASSWORD_LOGIN definido? $([ -n "$PASSWORD_LOGIN" ] && echo SIM || echo NAO)"
+          echo "MAILHOG_USER definido? $([ -n "$MAILHOG_USER" ] && echo SIM || echo NAO)"
+          echo "MAILHOG_PASSWORD definido? $([ -n "$MAILHOG_PASSWORD" ] && echo SIM || echo NAO)"
+          echo "XRAY_CLIENT_ID_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_ID_TEST_NOVO" ] && echo SIM || echo NAO)"
+          echo "XRAY_CLIENT_SECRET_TEST_NOVO definido? $([ -n "$XRAY_CLIENT_SECRET_TEST_NOVO" ] && echo SIM || echo NAO)"
+          echo "================================"
+
       - name: Executar testes cadastro
         run: npm run test:cadastro
 
