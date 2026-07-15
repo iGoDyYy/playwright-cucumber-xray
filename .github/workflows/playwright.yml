@@ -20,6 +20,10 @@ jobs:
     env:
       EMAIL_LOGIN: ${{ secrets.EMAIL_LOGIN }}
       PASSWORD_LOGIN: ${{ secrets.PASSWORD_LOGIN }}
+
+      MAILHOG_USER: ${{ secrets.MAILHOG_USER }}
+      MAILHOG_PASSWORD: ${{ secrets.MAILHOG_PASSWORD }}
+
       XRAY_CLIENT_ID_TEST_NOVO: ${{ secrets.XRAY_CLIENT_ID_TEST_NOVO }}
       XRAY_CLIENT_SECRET_TEST_NOVO: ${{ secrets.XRAY_CLIENT_SECRET_TEST_NOVO }}
 
@@ -62,6 +66,22 @@ jobs:
             exit 1
           else
             echo "PASSWORD_LOGIN OK"
+          fi
+
+          echo "MAILHOG_USER existe?"
+          if [ -z "$MAILHOG_USER" ]; then
+            echo "MAILHOG_USER NÃO CONFIGURADO"
+            exit 1
+          else
+            echo "MAILHOG_USER OK"
+          fi
+
+          echo "MAILHOG_PASSWORD existe?"
+          if [ -z "$MAILHOG_PASSWORD" ]; then
+            echo "MAILHOG_PASSWORD NÃO CONFIGURADO"
+            exit 1
+          else
+            echo "MAILHOG_PASSWORD OK"
           fi
 
           echo "XRAY_CLIENT_ID_TEST_NOVO existe?"
